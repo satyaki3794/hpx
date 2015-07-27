@@ -382,7 +382,7 @@ namespace hpx { namespace lcos { namespace detail
                 if (!this->started_)
                     boost::throw_exception(hpx::thread_interrupted());
 
-                if (this->is_ready_locked())
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {

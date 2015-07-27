@@ -20,6 +20,7 @@
 #include <hpx/util/unique_function.hpp>
 #include <hpx/util/deferred_call.hpp>
 
+#include <boost/atomic.hpp>
 #include <boost/detail/atomic_count.hpp>
 #include <boost/detail/scoped_enum_emulation.hpp>
 #include <boost/exception_ptr.hpp>
@@ -296,9 +297,16 @@ namespace detail
         ///               error description if <code>&ec == &throws</code>.
         virtual result_type* get_result(error_code& ec = throws)
         {
-            // yields control if needed
-            wait(ec);
-            if (ec) return NULL;
+            int state = state_.load(/*boost::memory_order_acquire*/);
+            if (state == empty) {
+                // yields control if needed
+                wait(ec);
+                if (ec) return NULL;
+
+                state = state_.load(/*boost::memory_order_acquire*/);
+                HPX_ASSERT(state != empty);
+
+            }
 
             // No locking is required. Once a future has been made ready, which
             // is a postcondition of wait, either:
@@ -307,18 +315,10 @@ namespace detail
             // - there are multiple readers only (shared_future, lock hurts
             //   concurrency)
 
-            if (state_ == empty) {
-                // the value has already been moved out of this future
-                HPX_THROWS_IF(ec, no_state,
-                    "future_data::get_result",
-                    "this future has no valid shared state");
-                return NULL;
-            }
-
             // the thread has been re-activated by one of the actions
             // supported by this promise (see promise::set_event
             // and promise::set_exception).
-            if (state_ == exception)
+            if (state == exception)
             {
                 boost::exception_ptr* exception_ptr =
                     static_cast<boost::exception_ptr*>(storage_.address());
@@ -391,33 +391,25 @@ namespace detail
         template <typename Target>
         void set_value(Target && data, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
-
-            // check whether the data has already been set
-            if (is_ready_locked()) {
-                l.unlock();
-                HPX_THROWS_IF(ec, promise_already_satisfied,
-                    "future_data::set_value",
-                    "data has already been set for this future");
-                return;
-            }
-
             completed_callback_type on_completed;
+            {
+                // set the data
+                result_type* value_ptr =
+                    static_cast<result_type*>(storage_.address());
+                ::new ((void*)value_ptr) result_type(
+                    future_data_result<Result>::set(std::forward<Target>(data)));
 
-            on_completed = std::move(this->on_completed_);
+                boost::unique_lock<mutex_type> l(mtx_);
+                int const state = state_.exchange(value/*, boost::memory_order_release*/);
 
-            // set the data
-            result_type* value_ptr =
-                static_cast<result_type*>(storage_.address());
-            ::new ((void*)value_ptr) result_type(
-                future_data_result<Result>::set(std::forward<Target>(data)));
-            state_ = value;
+                // check whether the data had already been set
+                HPX_ASSERT((state & ready) != ready);
 
-            // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), ec);
+                on_completed = std::move(this->on_completed_);
 
-            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
-            //       it unlocked when returning.
+                // handle all threads waiting for the future to become ready
+                cond_.notify_all(std::move(l), ec);
+            }
 
             // invoke the callback (continuation) function
             if (on_completed)
@@ -427,33 +419,25 @@ namespace detail
         template <typename Target>
         void set_exception(Target && data, error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(this->mtx_);
-
-            // check whether the data has already been set
-            if (is_ready_locked()) {
-                l.unlock();
-                HPX_THROWS_IF(ec, promise_already_satisfied,
-                    "future_data::set_exception",
-                    "data has already been set for this future");
-                return;
-            }
-
             completed_callback_type on_completed;
+            {
+                // set the data
+                boost::exception_ptr* exception_ptr =
+                    static_cast<boost::exception_ptr*>(storage_.address());
+                ::new ((void*)exception_ptr) boost::exception_ptr(
+                    std::forward<Target>(data));
 
-            on_completed = std::move(this->on_completed_);
+                boost::unique_lock<mutex_type> l(mtx_);
+                int const state = state_.exchange(exception/*, boost::memory_order_release*/);
 
-            // set the data
-            boost::exception_ptr* exception_ptr =
-                static_cast<boost::exception_ptr*>(storage_.address());
-            ::new ((void*)exception_ptr) boost::exception_ptr(
-                std::forward<Target>(data));
-            state_ = exception;
+                // check whether the data had already been set
+                HPX_ASSERT((state & ready) != ready);
 
-            // handle all threads waiting for the future to become ready
-            cond_.notify_all(std::move(l), ec);
+                on_completed = std::move(this->on_completed_);
 
-            // Note: cv.notify_all() above 'consumes' the lock 'l' and leaves
-            //       it unlocked when returning.
+                // handle all threads waiting for the future to become ready
+                cond_.notify_all(std::move(l), ec);
+            }
 
             // invoke the callback (continuation) function
             if (on_completed)
@@ -503,7 +487,7 @@ namespace detail
             // and no reader
 
             // release any stored data and callback functions
-            switch (state_) {
+            switch (state_.exchange(empty/*, boost::memory_order_acq_rel*/)) {
             case value:
             {
                 result_type* value_ptr =
@@ -520,8 +504,6 @@ namespace detail
             }
             default: break;
             }
-
-            state_ = empty;
             on_completed_ = completed_callback_type();
         }
 
@@ -530,38 +512,46 @@ namespace detail
         /// Set the callback which needs to be invoked when the future becomes
         /// ready. If the future is ready the function will be invoked
         /// immediately.
-        void set_on_completed(completed_callback_type data_sink)
+        template <typename Callback>
+        void set_on_completed(Callback&& callback)
         {
-            if (!data_sink) return;
+            HPX_ASSERT(!util::detail::is_empty_function(callback));
 
-            boost::unique_lock<mutex_type> l(this->mtx_);
-
-            if (is_ready_locked()) {
-
-                HPX_ASSERT(!on_completed_);
-
+            if (is_ready()) {
                 // invoke the callback (continuation) function right away
-                l.unlock();
-
-                handle_on_completed(std::move(data_sink));
+                std::forward<Callback>(callback)();
             }
             else {
-                // store a combined callback wrapping the old and the new one
-                this->on_completed_ = compose_cb(
-                    std::move(data_sink), std::move(on_completed_));
+                completed_callback_type data_sink(std::forward<Callback>(callback));
+
+                boost::unique_lock<mutex_type> l(mtx_);
+                if (is_ready()) {
+                    l.unlock();
+
+                    // invoke the callback (continuation) function right away
+                    data_sink();
+                }
+                else {
+                    // store a combined callback wrapping the old and the new one
+                    this->on_completed_ = compose_cb(
+                        std::move(data_sink), std::move(on_completed_));
+                }
             }
         }
 
         virtual void wait(error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-
+            int state = state_.load(/*boost::memory_order_acquire*/);
             // block if this entry is empty
-            if (state_ == empty) {
-                cond_.wait(l, "future_data::wait", ec);
-                if (ec) return;
+            if (state == empty) {
+                boost::unique_lock<mutex_type> l(mtx_);
+                state = state_.load(/*boost::memory_order_acquire*/);
+                if (state == empty) {
+                    cond_.wait(l, "future_data::wait", ec);
+                    if (ec) return;
 
-                HPX_ASSERT(state_ != empty);
+                    HPX_ASSERT(state_.load(/*boost::memory_order_acquire*/) != empty);
+                }
             }
 
             if (&ec != &throws)
@@ -572,19 +562,21 @@ namespace detail
         wait_until(boost::chrono::steady_clock::time_point const& abs_time,
             error_code& ec = throws)
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-
+            int state = state_.load(/*boost::memory_order_acquire*/);
             // block if this entry is empty
-            if (state_ == empty) {
-                threads::thread_state_ex_enum const reason =
-                    cond_.wait_until(l, abs_time, "future_data::wait_until", ec);
-                if (ec) return future_status::uninitialized;
+            if (state == empty) {
+                boost::unique_lock<mutex_type> l(mtx_);
+                state = state_.load(/*boost::memory_order_acquire*/);
+                if (state == empty) {
+                    threads::thread_state_ex_enum const reason =
+                        cond_.wait_until(l, abs_time, "future_data::wait_until", ec);
+                    if (ec) return future_status::uninitialized;
 
-                if (reason == threads::wait_signaled)
-                    return future_status::timeout;
+                    if (reason == threads::wait_signaled)
+                        return future_status::timeout;
 
-                HPX_ASSERT(state_ != empty);
-                return future_status::ready;
+                    HPX_ASSERT(state_.load(/*boost::memory_order_acquire*/) != empty);
+                }
             }
 
             if (&ec != &throws)
@@ -597,25 +589,17 @@ namespace detail
         /// \a future.
         bool is_ready() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            return is_ready_locked();
-        }
-
-        bool is_ready_locked() const
-        {
-            return (state_ & ready) != 0;
+            return (state_.load(/*boost::memory_order_acquire*/) & ready) == ready;
         }
 
         bool has_value() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            return state_ == value;
+            return state_.load(/*boost::memory_order_acquire*/) == value;
         }
 
         bool has_exception() const
         {
-            boost::unique_lock<mutex_type> l(mtx_);
-            return state_ == exception;
+            return state_.load(/*boost::memory_order_acquire*/) == exception;
         }
 
     protected:
@@ -624,7 +608,7 @@ namespace detail
 
     private:
         local::detail::condition_variable cond_;    // threads waiting in read
-        state state_;                               // current state
+        boost::atomic<int> state_;                  // current state
         typename future_data_storage<Result>::type storage_;
     };
 
@@ -861,7 +845,7 @@ namespace detail
                 if (!this->started_)
                     boost::throw_exception(hpx::thread_interrupted());
 
-                if (this->is_ready_locked())
+                if (this->is_ready())
                     return;   // nothing we can do
 
                 if (id_ != threads::invalid_thread_id) {
