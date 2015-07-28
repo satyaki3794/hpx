@@ -53,7 +53,12 @@ struct basic_lockfree_queue_backend
         return queue_.empty();
     }
 
-  private:
+    boost::uint64_t max_items() const
+    {
+        return 0;       // no limit
+    }
+
+private:
     container_type queue_;
 };
 
@@ -118,6 +123,11 @@ struct lockfree_abp_fifo_backend
         return queue_.empty();
     }
 
+    boost::uint64_t max_items() const
+    {
+        return 0;       // no limit
+    }
+
   private:
     container_type queue_;
 };
@@ -166,6 +176,11 @@ struct lockfree_abp_lifo_backend
     bool empty()
     {
         return queue_.empty();
+    }
+
+    boost::uint64_t max_items() const
+    {
+        return 0;       // no limit
     }
 
   private:
