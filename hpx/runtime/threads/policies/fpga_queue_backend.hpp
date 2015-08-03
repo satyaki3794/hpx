@@ -11,6 +11,8 @@
 
 #if defined(HPX_HAVE_FPGA_QUEUES)
 #include <hpx/util/assert.hpp>
+#include <hpx/util/static.hpp>
+#include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 
 #include <immintrin.h>
 
@@ -67,23 +69,49 @@ namespace hpx { namespace threads { namespace policies
 
             return true;
         }
+
+        ///////////////////////////////////////////////////////////////////////
+        struct pci_device
+        {
+            pci_device()
+              : info_(),
+                device_(info_)
+            {}
+
+            struct tag {};
+
+            static pci_device& get()
+            {
+                util::static_<pci_device, pci_device::tag> pcidevice;
+                return pcidevice.get();
+            }
+
+            PCI::DevInfo info_;
+            PCI::Device device_;
+        };
+
+
+        inline PCI::Region& get_pci_device_region()
+        {
+            pci_device& device = pci_device::get();
+            return device.device_.bar_region(device.info_);
+        }
+
+        inline boost::uint8_t* get_pci_device_base()
+        {
+            return get_pci_device_region().base_;
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////
     struct fpga_queue
     {
         fpga_queue(boost::uint64_t device_no)
-          : base_(0), device_no_(static_cast<int>(device_no)), count_(0)
+          : base_(get_pci_device_base()),
+            device_no_(static_cast<int>(device_no))
         {
-            PCI::DevInfo ;
-            info.vendor_ = APX_VENDOR_ID;
-            info.device_ = device_no;
-
-            PCI::Device device(info);
-            base_ = reinterpret_cast<boost::uint8_t>(
-                device.bar_region(info.bar_).addr_);
-
             HPX_ASSERT(0 != base_);
+            HPX_ASSERT(boost::uint64_t(-1) != device_no);
 
             // make sure we have a sufficient number of queues available which
             // support a sufficiently wide word storage
@@ -134,6 +162,7 @@ namespace hpx { namespace threads { namespace policies
     };
 
     ///////////////////////////////////////////////////////////////////////////
+    // FPGA queue without overflow
     template <typename T>
     struct fpga_queue_backend
     {
@@ -153,14 +182,14 @@ namespace hpx { namespace threads { namespace policies
         {
             if (other_end)
                 return queue_.push_right(reinterpret_cast<boost::uint64_t>(val));
-            return queue_.push_left(reinterpret_cast<boost::uint64_t>(val)));
+            return queue_.push_left(reinterpret_cast<boost::uint64_t>(val));
         }
 
         bool pop(reference val, bool steal = true)
         {
             if (steal)
-                return queue_.pop_left(reinterpret_cast<boost::uint64_t&>(val)));
-            return queue_.pop_right(reinterpret_cast<boost::uint64_t&>(val)));
+                return queue_.pop_left(reinterpret_cast<boost::uint64_t&>(val));
+            return queue_.pop_right(reinterpret_cast<boost::uint64_t&>(val));
         }
 
         bool empty()
@@ -168,11 +197,15 @@ namespace hpx { namespace threads { namespace policies
             return queue_.empty();
         }
 
+        boost::uint64_t max_items() const
+        {
+            return queue_.max_items()
+        }
+
       private:
         container_type queue_;
     };
 
-    ///////////////////////////////////////////////////////////////////////////
     struct fpga_fifo
     {
         template <typename T>
@@ -180,6 +213,88 @@ namespace hpx { namespace threads { namespace policies
         {
             BOOST_STATIC_ASSERT(sizeof(T) == sizeof(boost::uint64_t));
             typedef fpga_queue_backend<T> type;
+        };
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    struct fpga_queue_with_overflow_backend
+    {
+        typedef fpga_queue container_type;
+        typedef T value_type;
+        typedef T& reference;
+        typedef T const& const_reference;
+        typedef boost::uint64_t size_type;
+
+        fpga_queue_with_overflow_backend(
+                size_type initial_size = 0,
+                size_type num_thread = size_type(-1))
+          : fpga_queue_(num_thread),
+            count_(0),
+            fpga_queue_max_size_(fpga_queue_.max_items()),
+            overflow_queue_(initial_size, num_thread)
+        {}
+
+        bool push(const_reference val, bool other_end = false)
+        {
+            // If limit of hardware queue is reached, push into overflow,
+            // otherwise push into hardware queue.
+            if (++count_ >= fpga_queue_max_size_)
+                return overflow_queue_.push(val, other_end);
+
+            return fpga_queue_.push(val, other_end);
+        }
+
+        bool pop(reference val, bool steal = true)
+        {
+            // If there is at least one item in the hardware queue, take it,
+            // otherwise return false.
+            if (count_-- < 0)
+            {
+                ++count_;
+                return false;
+            }
+
+            bool result = fpga_queue_.pop(val, steal);
+
+            // Move one item from the overflow queue into the hardware queue,
+            // if possible.
+            value_type next_val;
+            if (overflow_queue_.pop(next_val))
+            {
+                // If limit of hardware queue is reached, push into overflow,
+                // otherwise push into hardware queue.
+                if (++count_ >= fpga_queue_max_size_)
+                    overflow_queue_.push(next_val, true);
+                else
+                    fpga_queue_.push(next_val);
+            }
+
+            return result;
+        }
+
+        bool empty() const
+        {
+            return count_.load() <= 0;
+        }
+
+    private:
+        typedef typename fpga_fifo::apply<T>::type fpga_queue_type;
+        typedef typename lockfree_fifo::apply<T>::type overflow_queue_type;
+
+        fpga_queue_type fpga_queue_;
+        std::atomic<boost::int64_t> count_;
+        std::size_t fpga_queue_max_size_;
+        overflow_queue_type overflow_queue_;
+    };
+
+    struct fpga_overflow_fifo
+    {
+        template <typename T>
+        struct apply
+        {
+            BOOST_STATIC_ASSERT(sizeof(T) == sizeof(boost::uint64_t));
+            typedef fpga_queue_with_overflow_backend<T> type;
         };
     };
 }}}
