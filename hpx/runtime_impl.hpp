@@ -364,7 +364,6 @@ namespace hpx
 
         /// Generate a new notification policy instance for the given thread
         /// name prefix
-        typedef threads::policies::callback_notifier notification_policy_type;
         notification_policy_type get_notification_policy(char const* prefix);
 
     private:
