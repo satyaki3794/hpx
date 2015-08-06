@@ -470,7 +470,7 @@ namespace hpx { namespace threads
         // thread manager.
         virtual mask_cref_type get_used_processing_units() const = 0;
 
-        // Return the executor associated with th egiven thread
+        // Return the executor associated with the given thread
         virtual executor get_executor(thread_id_type const& id, error_code& ec) const = 0;
 
         ///////////////////////////////////////////////////////////////////////

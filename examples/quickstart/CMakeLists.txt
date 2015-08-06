@@ -12,6 +12,7 @@ set(example_programs
     component_inheritance_simple
     component_with_executor
     composable_guard
+    custom_scheduler
     customize_async
     data_actions
     error_handling

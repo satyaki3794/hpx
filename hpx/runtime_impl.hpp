@@ -362,6 +362,11 @@ namespace hpx
         /// Unregister an external OS-thread with HPX
         bool unregister_thread();
 
+        /// Generate a new notification policy instance for the given thread
+        /// name prefix
+        typedef threads::policies::callback_notifier notification_policy_type;
+        notification_policy_type get_notification_policy(char const* prefix);
+
     private:
         void init_tss(char const* context, std::size_t num, char const* postfix,
             bool service_thread);
