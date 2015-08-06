@@ -37,18 +37,18 @@ using namespace hpx::threads::policies;
 //
 typedef static_queue_scheduler<> scheduling_policy_type;
 //
-// template<>
-// void hpx::threads::detail::scheduling_loop<scheduling_policy_type>(
-//   std::size_t num_thread, scheduling_policy_type& scheduler,
-//   boost::atomic<hpx::state>& global_state, scheduling_counters& counters,
-//   util::function_nonser<void()> const& cb_outer,
-//   util::function_nonser<void()> const& cb_inner)
-// {
-//   util::itt::stack_context ctx;        // helper for itt support
-//   util::itt::domain domain(get_thread_name().data());
-//   //         util::itt::id threadid(domain, this);
-//   util::itt::frame_context fctx(domain);
-// }
+//template<>
+//void hpx::threads::detail::scheduling_loop<scheduling_policy_type>(
+//  std::size_t num_thread, scheduling_policy_type& scheduler,
+//  boost::atomic<hpx::state>& global_state, scheduling_counters& counters,
+//  util::function_nonser<void()> const& cb_outer,
+//  util::function_nonser<void()> const& cb_inner)
+//{
+//  util::itt::stack_context ctx;        // helper for itt support
+//  util::itt::domain domain(get_thread_name().data());
+//  //         util::itt::id threadid(domain, this);
+//  util::itt::frame_context fctx(domain);
+//}
 
 
 //----------------------------------------------------------------------------
@@ -78,13 +78,13 @@ public:
   hpx::threads::detail::thread_pool<scheduling_policy_type> pool_;
 
   // avoid warnings about usage of this in member initializer list
-   custom_scheduler* This() { return this; }
+  custom_scheduler* This() { return this; }
 
-//   static void init_tss(std::size_t num, char const* name)
-//   {
-//     hpx::runtime *runtime = hpx::get_runtime_ptr();
-//     runtime->register_thread(name, num, false);
-//   }
+  //   static void init_tss(std::size_t num, char const* name)
+  //   {
+  //     hpx::runtime *runtime = hpx::get_runtime_ptr();
+  //     runtime->register_thread(name, num, false);
+  //   }
 
   //----------------------------------------------------------------------------
   custom_scheduler() :
@@ -155,11 +155,36 @@ public:
 
 
 
+
 //----------------------------------------------------------------------------
-int demo(int x)
+int demo(int runfor, int pause)
 {
-    std::cout << "Demo function " << x << std::endl;
-    return 1;
+  // timing
+  boost::int64_t zero_time = 0;
+  hpx::util::high_resolution_timer t;
+
+  while (runfor<0 || t.elapsed()<runfor)
+  {
+    // try to detect when hpx is shutting down
+    hpx::state run_state;
+    hpx::runtime* rt = hpx::get_runtime_ptr();
+    if (NULL == rt) {
+      // we're probably either starting or stopping
+      run_state = hpx::state_running;
+    }
+    else run_state = (rt->get_thread_manager().status());
+    std::cout << "demo : hpx runtime state is " << (int)run_state << std::endl;
+
+    // stop collecting data when the runtime is exiting
+    // @TODO find out why quit does not work.
+    bool closing = hpx::threads::threadmanager_is(hpx::state_pre_shutdown);
+    if (closing) return 0;
+
+    // Schedule a suspend/wakeup after each check
+    hpx::this_thread::suspend(pause);
+  }
+  // exit when thread is terminated or shutting down
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -167,71 +192,72 @@ int demo(int x)
 //----------------------------------------------------------------------------
 int monitor(double runfor, boost::uint64_t pause)
 {
-    // timing
-    boost::int64_t zero_time = 0;
-    hpx::util::high_resolution_timer t;
+  // timing
+  boost::int64_t zero_time = 0;
+  hpx::util::high_resolution_timer t;
 
-    while (runfor<0 || t.elapsed()<runfor)
-    {
-        // try to detect when hpx is shutting down
-        hpx::state run_state;
-        hpx::runtime* rt = hpx::get_runtime_ptr();
-        if (NULL == rt) {
-            // we're probably either starting or stopping
-            run_state = hpx::state_running;
-        }
-        else run_state = (rt->get_thread_manager().status());
-        std::cout << "hpx runtime state is " << (int)run_state << std::endl;
-
-        // stop collecting data when the runtime is exiting
-        // @TODO find out why quit does not work.
-        bool closing = hpx::threads::threadmanager_is(hpx::state_pre_shutdown);
-        if (closing) return 0;
-
-        // Schedule a suspend/wakeup after each check
-        hpx::this_thread::suspend(pause);
+  while (runfor<0 || t.elapsed()<runfor)
+  {
+    // try to detect when hpx is shutting down
+    hpx::state run_state;
+    hpx::runtime* rt = hpx::get_runtime_ptr();
+    if (NULL == rt) {
+      // we're probably either starting or stopping
+      run_state = hpx::state_running;
     }
-    // exit when thread is terminated or shutting down
-    return 0;
+    else run_state = (rt->get_thread_manager().status());
+    std::cout << "hpx runtime state is " << (int)run_state << std::endl;
+
+    // stop collecting data when the runtime is exiting
+    // @TODO find out why quit does not work.
+    bool closing = hpx::threads::threadmanager_is(hpx::state_pre_shutdown);
+    if (closing) return 0;
+
+    // Schedule a suspend/wakeup after each check
+    hpx::this_thread::suspend(pause);
+  }
+  // exit when thread is terminated or shutting down
+  return 0;
 }
 
 //----------------------------------------------------------------------------
 int hpx_main(boost::program_options::variables_map& vm)
 {
-    // instead of executing a normal async call using
-    //   hpx::async(monitor, -1, 1000);
-    // we will manually create a high-priority thread to poll the performance counters
-    // we do this so that we get as much info as possible, but it still can be made to wait
-    // until a free work queue is available.
-    // @TODO This will be moved into a custom scheduler once it is ready.
-    hpx::error_code ec(hpx::lightweight);
-    hpx::applier::register_thread_nullary(
-            hpx::util::bind(&monitor, 10, 1000),
-            "monitor",
-            hpx::threads::pending, true, hpx::threads::thread_priority_critical,
-            -1, hpx::threads::thread_stacksize_default, ec);
+  //    LOG_DEBUG_MSG("About to instantiate custom scheduler");
+  std::cout << "About to create custom scheduler" << std::endl;
+  custom_scheduler my_scheduler;
+  std::cout << "About to create custom scheduler" << std::endl;
 
-    {
+  my_scheduler.init();
 
-    //
-//    LOG_DEBUG_MSG("About to instantiate custom scheduler");
-    std::cout << "About to create custom scheduler"<<std::endl;
-    custom_scheduler my_scheduler;
-    std::cout << "About to create custom scheduler"<<std::endl;
 
-    my_scheduler.init();
+  // instead of executing a normal async call using
+  //   hpx::async(monitor, -1, 1000);
+  // we will manually create a high-priority thread to poll the performance counters
+  // we do this so that we get as much info as possible, but it still can be made to wait
+  // until a free work queue is available.
+  // @TODO This will be moved into a custom scheduler once it is ready.
+  hpx::error_code ec(hpx::lightweight);
+  hpx::applier::register_thread_nullary(
+    hpx::util::bind(&monitor, 10, 1000),
+    "monitor",
+    hpx::threads::pending, true, hpx::threads::thread_priority_critical,
+    -1, hpx::threads::thread_stacksize_default, ec);
 
-    //my_scheduler.register_thread_nullary(
-    //        hpx::util::bind(&demo, 42),
-    //        "demo",
-    //        hpx::threads::pending, true, hpx::threads::thread_priority_critical,
-    //        -1, hpx::threads::thread_stacksize_default, ec);
 
-    std::cout << "created custom scheduler"<<std::endl;
+  //  {
 
-    }
+  //
+  my_scheduler.register_thread_nullary(
+    hpx::util::bind(&demo, 10, 1000),
+    "demo",
+    hpx::threads::pending, true, hpx::threads::thread_priority_critical,
+    -1, hpx::threads::thread_stacksize_default, ec);
 
-    return hpx::finalize();
+
+  //  }
+
+  return hpx::finalize();
 }
 
 //----------------------------------------------------------------------------
@@ -245,13 +271,13 @@ int hpx_main(boost::program_options::variables_map& vm)
 //----------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
-    // Initialize and run HPX,
-    // we want to run hpx_main on all all localities so that each can initialize
-    // the stuff needed for the solver manager etc.
-    // This command line option is added to tell hpx to run hpx_main on all localities and not just rank 0
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
-    return hpx::init(argc, argv, cfg);
+  // Initialize and run HPX,
+  // we want to run hpx_main on all all localities so that each can initialize
+  // the stuff needed for the solver manager etc.
+  // This command line option is added to tell hpx to run hpx_main on all localities and not just rank 0
+  std::vector<std::string> cfg;
+  cfg.push_back("hpx.run_hpx_main!=1");
+  return hpx::init(argc, argv, cfg);
 }
 
 
