@@ -14,7 +14,7 @@
 #include <hpx/util/static.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 
-#include <immintrin.h>
+#include <hpx/runtime/threads/policies/fpga_support/pci.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>

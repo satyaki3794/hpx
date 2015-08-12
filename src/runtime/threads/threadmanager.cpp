@@ -1525,3 +1525,11 @@ template class HPX_EXPORT hpx::threads::threadmanager_impl<
     hpx::threads::policies::periodic_priority_queue_scheduler<> >;
 #endif
 
+#if defined(HPX_HAVE_FPGA_QUEUES)
+#include <hpx/runtime/threads/policies/fpga_schedulers.hpp>
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
+    hpx::threads::policies::local_fpga_priority_scheduler>;
+template class HPX_EXPORT hpx::threads::threadmanager_impl<
+    hpx::threads::policies::local_fpga_scheduler>;
+#endif
+

@@ -11,6 +11,9 @@
 #ifndef _PCI_H
 #define _PCI_H 1
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_FPGA_QUEUES)
 #include <map>
 #include <boost/filesystem.hpp>
 
@@ -85,4 +88,5 @@ namespace PCI
   } // namespace kdev
 } // namespace PCI
 
+#endif
 #endif // _PCI_H

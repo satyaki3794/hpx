@@ -2,7 +2,7 @@
 //
 // Copyright (c) 2009 Maciej Brodowicz
 //
-// Distributed under the Boost Software License, Version 1.0. (See accompanying 
+// Distributed under the Boost Software License, Version 1.0. (See accompanying
 // file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 //
 //////////////////////////////////////////////////////////////////////////////
@@ -11,6 +11,9 @@
 #ifndef _PCI_CONFIG_H
 #define _PCI_CONFIG_H 1
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_FPGA_QUEUES)
 #include <stdint.h>
 #include <string.h>
 #include <boost/assign/list_inserter.hpp>
@@ -354,4 +357,5 @@ namespace pci { namespace config
 
 } /* namespace config */ } /* namespace pci */
 
+#endif
 #endif // _PCI_CONFIG_H

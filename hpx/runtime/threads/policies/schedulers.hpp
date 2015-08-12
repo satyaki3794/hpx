@@ -21,5 +21,8 @@
 #if defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
 #include <hpx/runtime/threads/policies/periodic_priority_queue_scheduler.hpp>
 #endif
+#if defined(HPX_HAVE_FPGA_QUEUES)
+#include <hpx/runtime/threads/policies/fpga_schedulers.hpp>
+#endif
 
 #endif

@@ -9,6 +9,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_FPGA_QUEUES)
 #include "pci_config.h"
 #include "util.h"
 
@@ -67,3 +70,5 @@ namespace pci { namespace config
   }
 
 }}
+
+#endif

@@ -893,6 +893,71 @@ namespace hpx
 #endif
         }
 
+#if defined(HPX_HAVE_FPGA_QUEUES)
+        int run_fpga_priority(startup_function_type const& startup,
+            shutdown_function_type const& shutdown,
+            util::command_line_handling& cfg, bool blocking)
+        {
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+
+            std::size_t num_high_priority_queues =
+                get_num_high_priority_queues(cfg);
+            std::size_t pu_offset = get_pu_offset(cfg);
+            std::size_t pu_step = get_pu_step(cfg);
+            std::string affinity_domain = get_affinity_domain(cfg);
+            std::string affinity_desc;
+            bool numa_sensitive = get_affinity_description(cfg, affinity_desc);
+
+            // scheduling policy
+            typedef hpx::threads::policies::local_fpga_priority_scheduler
+                local_queue_policy;
+            local_queue_policy::init_parameter_type init(
+                cfg.num_threads_, num_high_priority_queues, 1000,
+                numa_sensitive);
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+            std::unique_ptr<hpx::runtime> rt(
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
+                    affinity_init));
+
+            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+        }
+
+        int run_fpga(startup_function_type const& startup,
+            shutdown_function_type const& shutdown,
+            util::command_line_handling& cfg, bool blocking)
+        {
+            ensure_high_priority_compatibility(cfg.vm_);
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+
+            std::size_t pu_offset = get_pu_offset(cfg);
+            std::size_t pu_step = get_pu_step(cfg);
+            std::string affinity_domain = get_affinity_domain(cfg);
+            std::string affinity_desc;
+            bool numa_sensitive = get_affinity_description(cfg, affinity_desc);
+
+            // scheduling policy
+            typedef hpx::threads::policies::local_fpga_scheduler
+                local_queue_policy;
+            local_queue_policy::init_parameter_type init(
+                cfg.num_threads_, 1000, numa_sensitive);
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            // Build and configure this runtime instance.
+            typedef hpx::runtime_impl<local_queue_policy> runtime_type;
+            std::unique_ptr<hpx::runtime> rt(
+                new runtime_type(cfg.rtcfg_, cfg.mode_, cfg.num_threads_, init,
+                    affinity_init));
+
+            return run_or_start(blocking, std::move(rt), cfg, startup, shutdown);
+        }
+
+#endif
+
         ///////////////////////////////////////////////////////////////////////
         HPX_EXPORT int run_or_start(
             util::function_nonser<int(boost::program_options::variables_map& vm)> const& f,
@@ -975,6 +1040,18 @@ namespace hpx
                     cfg.queuing_ = "periodic-priority";
                     result = run_periodic(startup, shutdown, cfg, blocking);
                 }
+#if defined(HPX_HAVE_FPGA_QUEUES)
+                else if (0 == std::string("fpga-priority").find(cfg.queuing_))
+                {
+                    cfg.queuing_ = "fpga-priority";
+                    result = run_fpga_priority(startup, shutdown, cfg, blocking);
+                }
+                else if (0 == std::string("fpga").find(cfg.queuing_))
+                {
+                    cfg.queuing_ = "fpga";
+                    result = run_fpga(startup, shutdown, cfg, blocking);
+                }
+#endif
                 else
                 {
                     throw detail::command_line_error(

@@ -9,6 +9,9 @@
 //
 //////////////////////////////////////////////////////////////////////////////
 
+#include <hpx/config.hpp>
+
+#if defined(HPX_HAVE_FPGA_QUEUES)
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <iostream>
@@ -232,3 +235,5 @@ namespace PCI
     }
   } // namespace kdev
 } // namespace PCI
+
+#endif

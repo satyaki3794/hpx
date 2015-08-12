@@ -217,6 +217,15 @@ else()
 endif()
 
 ################################################################################
+# Enable integration of FPGA based queuing
+hpx_option(HPX_WITH_FPGA_QUEUES BOOL
+  "Enable special FPGA based queues and schedulers (default: OFF)"
+  OFF ADVANCED)
+if(HPX_WITH_FPGA_QUEUES)
+  hpx_add_config_define(HPX_HAVE_FPGA_QUEUES)
+endif()
+
+################################################################################
 # Utility configuration
 ################################################################################
 set(HPX_HIDDEN_VISIBILITY_DEFAULT ON)
