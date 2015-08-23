@@ -12,6 +12,9 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_FPGA_QUEUES)
+#if (defined(__linux) || defined(linux) || defined(__linux__)) && \
+    !defined(__bgq__) && !defined(__powerpc__)
+
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <iostream>
@@ -28,6 +31,7 @@
 #include "error.h"
 #include "driver/apx.h"
 
+using namespace fs = boost::filesystem;
 
 namespace PCI
 {
@@ -236,4 +240,5 @@ namespace PCI
   } // namespace kdev
 } // namespace PCI
 
+#endif
 #endif

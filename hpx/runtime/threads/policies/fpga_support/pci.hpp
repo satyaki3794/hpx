@@ -23,8 +23,6 @@
 // root of PCI device tree in /sys (Linux)
 #define SYSPATH "/sys/bus/pci/devices"
 
-namespace fs = boost::filesystem;
-
 namespace PCI
 {
   // device parameters
@@ -52,13 +50,13 @@ namespace PCI
   // device access
   class Device
   {
-    fs::path dev_path_;
+    boost::filesystem::path dev_path_;
     DevInfo info_;
     std::map<int, Region> regmap_;
     Region regcfg_;
 
-    void read(fs::path const&, char *, int);
-    void get_info(fs::path const&);
+    void read(boost::filesystem::path const&, char *, int);
+    void get_info(boost::filesystem::path const&);
     void find(DevInfo const&);
     Region map_region(std::string const&);
     Region const& map_bar(int);

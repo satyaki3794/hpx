@@ -15,6 +15,7 @@
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 
 #include <hpx/runtime/threads/policies/fpga_support/pci.hpp>
+#include <hpx/runtime/threads/policies/fpga_support/queue_defs.hpp>
 
 #include <boost/cstdint.hpp>
 #include <boost/static_assert.hpp>
@@ -34,7 +35,7 @@ namespace hpx { namespace threads { namespace policies
 
         template <typename T>
         bool to_fpga(boost::uint8_t *bar, int queue_num, unsigned cmd,
-            T const* data)
+            T const& data)
         {
             HPX_ASSERT(
                 !((cmd & (MQ_REQ_GET_HEAD | MQ_REQ_GET_LAST)) ||
@@ -44,7 +45,7 @@ namespace hpx { namespace threads { namespace policies
             T *addr = cmd2addr<T>(bar, queue_num, cmd);
 
             // write to PCI memory space
-            *addr = *data;
+            *addr = data;
 
             // FIXME: error handling?
 
@@ -53,7 +54,7 @@ namespace hpx { namespace threads { namespace policies
 
         template <typename T>
         bool from_fpga(boost::uint8_t *bar, int queue_num, unsigned cmd,
-            T* data)
+            T& data)
         {
             HPX_ASSERT(
                 (cmd & (MQ_REQ_GET_HEAD | MQ_REQ_GET_LAST)) ||
@@ -63,7 +64,7 @@ namespace hpx { namespace threads { namespace policies
             T const*addr = cmd2addr<T>(bar, queue_num, cmd);
 
             // read from PCI memory space
-            *data = *addr;
+            data = *addr;
 
             // FIXME: error handling?
 
@@ -91,15 +92,16 @@ namespace hpx { namespace threads { namespace policies
         };
 
 
-        inline PCI::Region& get_pci_device_region()
+        inline PCI::Region const& get_pci_device_region()
         {
             pci_device& device = pci_device::get();
-            return device.device_.bar_region(device.info_);
+            return device.device_.bar_region(device.info_.bar_mask_);
         }
 
         inline boost::uint8_t* get_pci_device_base()
         {
-            return get_pci_device_region().base_;
+            return reinterpret_cast<boost::uint8_t*>(
+                get_pci_device_region().addr_);
         }
     }
 
@@ -107,7 +109,7 @@ namespace hpx { namespace threads { namespace policies
     struct fpga_queue
     {
         fpga_queue(boost::uint64_t device_no)
-          : base_(get_pci_device_base()),
+          : base_(detail::get_pci_device_base()),
             device_no_(static_cast<int>(device_no))
         {
             HPX_ASSERT(0 != base_);
@@ -115,31 +117,31 @@ namespace hpx { namespace threads { namespace policies
 
             // make sure we have a sufficient number of queues available which
             // support a sufficiently wide word storage
-            HPX_ASSERT(*cmd2addr(base_, 0, MQ_REQ_GET_NQ) > device_no_);
-            HPX_ASSERT(*cmd2addr(base_, 0, MQ_REQ_GET_WSIZE) >= 64);
+            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_NQ) > device_no_);
+            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_WSIZE) >= 64);
 
             // reset this queue
-            *cmd2addr(base_, device_no_, MQ_REQ_RESET) = 0;
+            *detail::cmd2addr(base_, device_no_, MQ_REQ_RESET) = 0;
         }
 
         bool push_left(boost::uint64_t data)
         {
-            detail::to_fpga(base_, device_no_, MQ_REQ_SET_HEAD, &data);
+            return detail::to_fpga(base_, device_no_, MQ_REQ_SET_HEAD, data);
         }
 
-        bool push_right(boost::uint64_t)
+        bool push_right(boost::uint64_t data)
         {
-            return detail::to_fpga(base_, device_no_, MQ_REQ_SET_LAST, &data);
-        }
-
-        bool pop_left(boost::uint64_t& data)
-        {
-            return detail::to_fpga(base_, device_no_, MQ_REQ_GET_HEAD, &data);
+            return detail::to_fpga(base_, device_no_, MQ_REQ_SET_LAST, data);
         }
 
         bool pop_left(boost::uint64_t& data)
         {
-            return detail::to_fpga(base_, device_no_, MQ_REQ_GET_LAST, &data);
+            return detail::from_fpga(base_, device_no_, MQ_REQ_GET_HEAD, data);
+        }
+
+        bool pop_right(boost::uint64_t& data)
+        {
+            return detail::from_fpga(base_, device_no_, MQ_REQ_GET_LAST, data);
         }
 
         bool empty() const
@@ -199,7 +201,7 @@ namespace hpx { namespace threads { namespace policies
 
         boost::uint64_t max_items() const
         {
-            return queue_.max_items()
+            return queue_.max_items();
         }
 
       private:
@@ -239,7 +241,7 @@ namespace hpx { namespace threads { namespace policies
         {
             // If limit of hardware queue is reached, push into overflow,
             // otherwise push into hardware queue.
-            if (++count_ >= fpga_queue_max_size_)
+            if (++count_ >= static_cast<boost::int64_t>(fpga_queue_max_size_))
                 return overflow_queue_.push(val, other_end);
 
             return fpga_queue_.push(val, other_end);
@@ -264,7 +266,7 @@ namespace hpx { namespace threads { namespace policies
             {
                 // If limit of hardware queue is reached, push into overflow,
                 // otherwise push into hardware queue.
-                if (++count_ >= fpga_queue_max_size_)
+                if (++count_ >= static_cast<boost::int64_t>(fpga_queue_max_size_))
                     overflow_queue_.push(next_val, true);
                 else
                     fpga_queue_.push(next_val);
