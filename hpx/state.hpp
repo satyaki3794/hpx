@@ -8,9 +8,6 @@
 #if !defined(HPX_703646B3_0567_484E_AD34_A752B8163B30)
 #define HPX_703646B3_0567_484E_AD34_A752B8163B30
 
-#include <boost/atomic.hpp>
-#include <boost/cstdint.hpp>
-
 #include <hpx/config.hpp>
 
 namespace hpx
@@ -19,6 +16,7 @@ namespace hpx
     {
         state_invalid = -1,
         state_initialized = 0,
+        first_valid_runtime_state = state_initialized,
         state_pre_startup = 1,
         state_startup = 2,
         state_pre_main = 3,

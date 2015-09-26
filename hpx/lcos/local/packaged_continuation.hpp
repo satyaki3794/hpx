@@ -7,11 +7,12 @@
 #if !defined(HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM)
 #define HPX_LCOS_LOCAL_CONTINUATION_APR_17_2012_0150PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/promise_remote_result.hpp>
 #include <hpx/traits/is_future.hpp>
 #include <hpx/traits/is_executor.hpp>
 #include <hpx/traits/future_access.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
@@ -35,7 +36,7 @@ namespace hpx { namespace lcos { namespace detail
         void apply(Source&& src, Destination& dest, boost::mpl::false_) const
         {
             try {
-                dest.set_result(src.get());
+                dest.set_value(src.get());
             }
             catch (...) {
                 dest.set_exception(boost::current_exception());
@@ -47,7 +48,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             try {
                 src.get();
-                dest.set_result(util::unused);
+                dest.set_value(util::unused);
             }
             catch (...) {
                 dest.set_exception(boost::current_exception());
@@ -70,7 +71,7 @@ namespace hpx { namespace lcos { namespace detail
         boost::mpl::false_)
     {
         try {
-            cont.set_result(func(std::move(future)));
+            cont.set_value(func(std::move(future)));
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
@@ -83,7 +84,7 @@ namespace hpx { namespace lcos { namespace detail
     {
         try {
             func(std::move(future));
-            cont.set_result(util::unused);
+            cont.set_value(util::unused);
         }
         catch (...) {
             cont.set_exception(boost::current_exception());
@@ -648,7 +649,7 @@ namespace hpx { namespace lcos { namespace detail
         {
             try {
                 (void)state->get_result();
-                this->set_result(util::unused);
+                this->set_value(util::unused);
             }
             catch (...) {
                 this->set_exception(boost::current_exception());

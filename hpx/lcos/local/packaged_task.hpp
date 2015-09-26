@@ -6,11 +6,12 @@
 #if !defined(HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM)
 #define HPX_LCOS_LOCAL_PACKAGED_TASK_MAR_01_2012_0121PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>
 #include <hpx/lcos/detail/future_data.hpp>
 #include <hpx/runtime/threads/thread_executor.hpp>
+#include <hpx/runtime/launch_policy.hpp>
 #include <hpx/traits/is_callable.hpp>
 #include <hpx/util/decay.hpp>
 #include <hpx/util/deferred_call.hpp>
@@ -56,7 +57,7 @@ namespace hpx { namespace lcos { namespace local
             void do_run()
             {
                 try {
-                    this->set_result(f_());
+                    this->set_value(f_());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
@@ -94,7 +95,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 try {
                     f_();
-                    this->set_result(result_type());
+                    this->set_value(result_type());
                 }
                 catch(...) {
                     this->set_exception(boost::current_exception());
@@ -379,7 +380,7 @@ namespace hpx { namespace lcos { namespace local
         explicit packaged_task(F && f,
             typename boost::enable_if_c<
                 !boost::is_same<typename util::decay<F>::type, packaged_task>::value
-             && traits::is_callable<typename util::decay<F>::type(Ts...)>::value
+             && traits::is_callable<typename util::decay<F>::type(Ts...), R>::value
             >::type* = 0)
           : base_type(std::forward<F>(f))
         {}

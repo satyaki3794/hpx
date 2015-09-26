@@ -10,18 +10,22 @@
 #include <hpx/config.hpp>
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) \
+           || HPX_INTEL_VERSION < 1400)
 #include <boost/shared_ptr.hpp>
 #else
 #include <memory>
 #endif
+
+#include <boost/cstdint.hpp>
 
 namespace hpx { namespace serialization
 {
     namespace detail
     {
         struct ptr_helper;
-#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) || HPX_INTEL_VERSION < 1400)
+#if defined(HPX_INTEL_VERSION) && ((__GNUC__ == 4 && __GNUC_MINOR__ == 4) \
+           || HPX_INTEL_VERSION < 1400)
         typedef boost::shared_ptr<ptr_helper> ptr_helper_ptr;
 #else
         typedef std::unique_ptr<ptr_helper> ptr_helper_ptr;
@@ -32,13 +36,11 @@ namespace hpx { namespace serialization
     struct output_archive;
 
     BOOST_FORCEINLINE
-    void register_pointer(input_archive & ar, boost::uint64_t pos, detail::ptr_helper_ptr helper);
+    void register_pointer(input_archive & ar, boost::uint64_t pos,
+        detail::ptr_helper_ptr helper);
 
     template <typename Helper>
     Helper & tracked_pointer(input_archive & ar, boost::uint64_t pos);
-
-    template <typename Archive, typename T>
-    void serialize(Archive & ar, T & t, unsigned);
 
     template <typename T>
     output_archive & operator<<(output_archive & ar, T const & t);

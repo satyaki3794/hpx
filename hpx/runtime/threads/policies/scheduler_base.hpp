@@ -1,4 +1,4 @@
-//  Copyright (c) 2007-2013 Hartmut Kaiser
+//  Copyright (c) 2007-2015 Hartmut Kaiser
 //
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
@@ -6,17 +6,26 @@
 #if !defined(HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM)
 #define HPX_THREADMANAGER_SCHEDULING_SCHEDULER_BASE_JUL_14_2013_1132AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
+#include <hpx/state.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
+#include <hpx/runtime/threads/policies/scheduler_mode.hpp>
+#include <hpx/runtime/agas/interface.hpp>
 #include <hpx/util/assert.hpp>
 
 #include <boost/noncopyable.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
+
+#include <boost/atomic.hpp>
+
+#include <algorithm>
+#include <utility>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace threads { namespace policies
@@ -47,13 +56,19 @@ namespace hpx { namespace threads { namespace policies
     /// scheduler policies
     struct scheduler_base : boost::noncopyable
     {
-        scheduler_base(std::size_t num_threads)
+        scheduler_base(std::size_t num_threads,
+                scheduler_mode mode = nothing_special)
           : topology_(get_topology())
           , affinity_data_(num_threads)
+          , mode_(mode)
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
           , wait_count_(0)
 #endif
-        {}
+        {
+            states_.resize(num_threads);
+            for (std::size_t i = 0; i != num_threads; ++i)
+                states_[i].store(state_initialized);
+        }
 
         virtual ~scheduler_base() {}
 
@@ -99,6 +114,17 @@ namespace hpx { namespace threads { namespace policies
 #endif
         }
 
+        bool background_callback(std::size_t num_thread)
+        {
+            bool result = false;
+            if (hpx::parcelset::do_background_work(num_thread))
+                result = true;
+
+            if (0 == num_thread)
+                hpx::agas::garbage_collect_non_blocking();
+            return result;
+        }
+
         /// This function gets called by the thread-manager whenever new work
         /// has been added, allowing the scheduler to reactivate one or more of
         /// possibly idling OS threads
@@ -112,6 +138,75 @@ namespace hpx { namespace threads { namespace policies
             else
                 cond_.notify_one();
 #endif
+        }
+
+        // allow to access/manipulate states
+        boost::atomic<hpx::state>& get_state(std::size_t num_thread)
+        {
+            HPX_ASSERT(num_thread < states_.size());
+            return states_[num_thread];
+        }
+        boost::atomic<hpx::state> const& get_state(std::size_t num_thread) const
+        {
+            HPX_ASSERT(num_thread < states_.size());
+            return states_[num_thread];
+        }
+
+        void set_all_states(hpx::state s)
+        {
+            typedef boost::atomic<hpx::state> state_type;
+            for (state_type& state : states_)
+                state.store(s);
+        }
+
+        // return whether all states are at least at the given one
+        bool has_reached_state(hpx::state s) const
+        {
+            typedef boost::atomic<hpx::state> state_type;
+            for (state_type const& state : states_)
+            {
+                if (state.load() < s)
+                    return false;
+            }
+            return true;
+        }
+
+        bool is_state(hpx::state s) const
+        {
+            typedef boost::atomic<hpx::state> state_type;
+            for (state_type const& state : states_)
+            {
+                if (state.load() != s)
+                    return false;
+            }
+            return true;
+        }
+
+        std::pair<hpx::state, hpx::state> get_minmax_state() const
+        {
+            std::pair<hpx::state, hpx::state> result(
+                last_valid_runtime_state, first_valid_runtime_state);
+
+            typedef boost::atomic<hpx::state> state_type;
+            for (state_type const& state : states_)
+            {
+                hpx::state s = state.load();
+                result.first = (std::min)(result.first, s);
+                result.second = (std::max)(result.second, s);
+            }
+
+            return result;
+        }
+
+        // get/set scheduler mode
+        scheduler_mode get_scheduler_mode() const
+        {
+            return mode_.load(boost::memory_order_acquire);
+        }
+
+        void set_scheduler_mode(scheduler_mode mode)
+        {
+            mode_.store(mode);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -187,9 +282,12 @@ namespace hpx { namespace threads { namespace policies
             boost::atomic<hpx::state>& global_state)
         {}
 
+        virtual void reset_thread_distribution() {}
+
     protected:
         topology const& topology_;
         detail::affinity_data affinity_data_;
+        boost::atomic<scheduler_mode> mode_;
 
 #if defined(HPX_HAVE_THREAD_MANAGER_IDLE_BACKOFF)
         // support for suspension on idle queues
@@ -197,6 +295,8 @@ namespace hpx { namespace threads { namespace policies
         boost::condition_variable cond_;
         boost::atomic<boost::uint32_t> wait_count_;
 #endif
+
+        boost::ptr_vector<boost::atomic<hpx::state> > states_;
     };
 }}}
 

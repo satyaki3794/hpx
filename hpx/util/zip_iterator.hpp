@@ -8,10 +8,12 @@
 #define HPX_UTIL_ZIP_ITERATOR_MAY_29_2014_0852PM
 
 #include <hpx/util/tuple.hpp>
+#include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/detail/pack.hpp>
 #include <hpx/util/result_of.hpp>
+#include <hpx/util/functional/segmented_iterator_helpers.hpp>
 #include <hpx/runtime/serialization/serialize_sequence.hpp>
-#include <hpx/traits/segmented_iterator_traits.hpp>
+#include <hpx/runtime/naming/id_type.hpp>
 
 #include <boost/fusion/algorithm/iteration/for_each.hpp>
 #include <boost/iterator/iterator_facade.hpp>
@@ -528,7 +530,7 @@ namespace hpx { namespace traits
         {
             return segment_iterator(
                 functional::lift_zipped_iterators<
-                        functional::segmented_iterator_segment, iterator
+                        util::functional::segmented_iterator_segment, iterator
                     >::call(iter));
         }
 
@@ -538,7 +540,7 @@ namespace hpx { namespace traits
         {
             return local_iterator(
                 functional::lift_zipped_iterators<
-                        functional::segmented_iterator_local, iterator
+                        util::functional::segmented_iterator_local, iterator
                     >::call(iter));
         }
 
@@ -548,7 +550,7 @@ namespace hpx { namespace traits
         {
             return local_iterator(
                 functional::lift_zipped_iterators<
-                        functional::segmented_iterator_begin, iterator
+                        util::functional::segmented_iterator_begin, iterator
                     >::call(iter));
         }
 
@@ -558,7 +560,7 @@ namespace hpx { namespace traits
         {
             return local_iterator(
                 functional::lift_zipped_iterators<
-                        functional::segmented_iterator_end, iterator
+                        util::functional::segmented_iterator_end, iterator
                     >::call(iter));
         }
 
@@ -568,7 +570,8 @@ namespace hpx { namespace traits
         {
             return local_raw_iterator(
                 functional::lift_zipped_iterators<
-                        functional::segmented_iterator_local_begin, iterator
+                        util::functional::segmented_iterator_local_begin,
+                        iterator
                     >::call(seg_iter));
         }
 
@@ -578,13 +581,14 @@ namespace hpx { namespace traits
         {
             return local_raw_iterator(
                 functional::lift_zipped_iterators<
-                        functional::segmented_iterator_local_end, iterator
+                        util::functional::segmented_iterator_local_end,
+                        iterator
                     >::call(seg_iter));
         }
 
         // Extract the base id for the segment referenced by the given segment
         // iterator.
-        static id_type get_id(segment_iterator const& iter)
+        static naming::id_type get_id(segment_iterator const& iter)
         {
             typedef typename util::tuple_element<
                     0, typename iterator::iterator_tuple_type
@@ -601,7 +605,8 @@ namespace hpx { namespace traits
         util::zip_iterator<Ts...>,
         typename std::enable_if<
             util::detail::all_of<
-                typename segmented_local_iterator_traits<Ts>::is_segmented_local_iterator...
+                typename segmented_local_iterator_traits<Ts>
+                ::is_segmented_local_iterator...
             >::value
         >::type>
     {

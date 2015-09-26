@@ -11,10 +11,20 @@
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/detail/periodic_maintenance.hpp>
 #include <hpx/runtime/agas/interface.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/itt_notify.hpp>
 #include <hpx/util/hardware/timestamp.hpp>
+#include <hpx/util/assert.hpp>
+#include <hpx/util/move.hpp>
+#include <hpx/util/function.hpp>
+#include <hpx/util/safe_lexical_cast.hpp>
 
 #include <boost/cstdint.hpp>
+
+#if defined(HPX_HAVE_APEX)
+#include <hpx/util/apex.hpp>
+#endif
+#include <limits>
 
 namespace hpx { namespace threads { namespace detail
 {
@@ -183,14 +193,55 @@ namespace hpx { namespace threads { namespace detail
 #endif
 
     ///////////////////////////////////////////////////////////////////////////
+    struct scheduling_counters
+    {
+        scheduling_counters(boost::int64_t& executed_threads,
+                boost::int64_t& executed_thread_phases,
+                boost::uint64_t& tfunc_time, boost::uint64_t& exec_time)
+          : executed_threads_(executed_threads),
+            executed_thread_phases_(executed_thread_phases),
+            tfunc_time_(tfunc_time),
+            exec_time_(exec_time)
+        {}
+
+        boost::int64_t& executed_threads_;
+        boost::int64_t& executed_thread_phases_;
+        boost::uint64_t& tfunc_time_;
+        boost::uint64_t& exec_time_;
+    };
+
+    struct scheduling_callbacks
+    {
+        typedef util::function_nonser<void()> callback_type;
+        typedef util::function_nonser<bool()> background_callback_type;
+
+        explicit scheduling_callbacks(
+                callback_type && outer,
+                callback_type && inner = callback_type(),
+                background_callback_type && background =
+                    background_callback_type(),
+                std::size_t max_background_threads =
+                    hpx::util::safe_lexical_cast<std::size_t>(
+                        hpx::get_config_entry("hpx.max_background_threads",
+                            (std::numeric_limits<std::size_t>::max)())))
+          : outer_(std::move(outer)),
+            inner_(std::move(inner)),
+            background_(std::move(background)),
+            max_background_threads_(max_background_threads)
+        {}
+
+        callback_type outer_;
+        callback_type inner_;
+        background_callback_type background_;
+        std::size_t max_background_threads_;
+    };
+
     template <typename SchedulingPolicy>
     void scheduling_loop(std::size_t num_thread, SchedulingPolicy& scheduler,
-        boost::atomic<hpx::state>& global_state, boost::int64_t& executed_threads,
-        boost::int64_t& executed_thread_phases, boost::uint64_t& tfunc_time,
-        boost::uint64_t& exec_time,
-        util::function_nonser<void()> const& cb_outer = util::function_nonser<void()>(),
-        util::function_nonser<void()> const& cb_inner = util::function_nonser<void()>())
+        scheduling_counters& counters, scheduling_callbacks& callbacks)
     {
+        boost::atomic<hpx::state>& this_state = scheduler.get_state(num_thread);
+
         util::itt::stack_context ctx;        // helper for itt support
         util::itt::domain domain(get_thread_name().data());
 //         util::itt::id threadid(domain, this);
@@ -199,10 +250,10 @@ namespace hpx { namespace threads { namespace detail
         boost::int64_t idle_loop_count = 0;
         boost::int64_t busy_loop_count = 0;
 
-        idle_collect_rate idle_rate(tfunc_time, exec_time);
+        idle_collect_rate idle_rate(counters.tfunc_time_, counters.exec_time_);
         tfunc_time_wrapper tfunc_time_collector(idle_rate);
 
-        scheduler.SchedulingPolicy::start_periodic_maintenance(global_state);
+        scheduler.SchedulingPolicy::start_periodic_maintenance(this_state);
 
         // spin for some time after queues have become empty
         bool may_exit = false;
@@ -218,6 +269,7 @@ namespace hpx { namespace threads { namespace detail
 
                 idle_loop_count = 0;
                 ++busy_loop_count;
+
                 may_exit = false;
 
                 // Only pending HPX threads will be executed.
@@ -251,11 +303,23 @@ namespace hpx { namespace threads { namespace detail
                                 // Record time elapsed in thread changing state
                                 // and add to aggregate execution time.
                                 exec_time_wrapper exec_time_collector(idle_rate);
+#if defined(HPX_HAVE_APEX)
+                                util::apex_wrapper apex_profiler(thrd->get_description());
+#endif
                                 thrd_stat = (*thrd)();
+#if defined(HPX_HAVE_APEX)
+                                thread_state prev_state = thrd_stat.get_previous();
+                                thread_state_enum prev_state_enum = prev_state;
+                                if(prev_state_enum == terminated) {
+                                    apex_profiler.stop();
+                                } else {
+                                    apex_profiler.yield();
+                                }
+#endif
                             }
 
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-                            ++executed_thread_phases;
+                            ++counters.executed_thread_phases_;
 #endif
                         }
                         else {
@@ -292,11 +356,12 @@ namespace hpx { namespace threads { namespace detail
                     if (state_val == pending) {
                         // schedule other work
                         scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                            is_running_state(global_state.load()), idle_loop_count);
+                            is_running_state(this_state.load()), idle_loop_count);
 
                         // schedule this thread again, make sure it ends up at
                         // the end of the queue
-                        scheduler.SchedulingPolicy::schedule_thread_last(thrd, num_thread);
+                        scheduler.SchedulingPolicy::schedule_thread_last(thrd,
+                            num_thread);
                         scheduler.SchedulingPolicy::do_some_work(num_thread);
                     }
                 }
@@ -323,7 +388,7 @@ namespace hpx { namespace threads { namespace detail
                 if (state_val == depleted || state_val == terminated)
                 {
 #ifdef HPX_HAVE_THREAD_CUMULATIVE_COUNTS
-                    ++executed_threads;
+                    ++counters.executed_threads_;
 #endif
                     scheduler.SchedulingPolicy::destroy_thread(thrd, busy_loop_count);
                 }
@@ -334,12 +399,19 @@ namespace hpx { namespace threads { namespace detail
                 ++idle_loop_count;
 
                 if (scheduler.SchedulingPolicy::wait_or_add_new(num_thread,
-                        is_running_state(global_state.load()), idle_loop_count))
+                        is_running_state(this_state.load()), idle_loop_count))
                 {
                     // clean up terminated threads one more time before existing
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
                     {
-                        // keep idling for some time
+                        // if this is an inner scheduler, exit immediately
+                        if (!(scheduler.get_scheduler_mode() & policies::delay_exit))
+                        {
+                            this_state.store(state_stopped);
+                            break;
+                        }
+
+                        // otherwise, keep idling for some time
                         if (!may_exit)
                             idle_loop_count = 0;
                         may_exit = true;
@@ -347,21 +419,21 @@ namespace hpx { namespace threads { namespace detail
                 }
 
                 // do background work in parcel layer and in agas
-                if (hpx::parcelset::do_background_work(num_thread))
-                    idle_loop_count = 0;
-
-                if (0 == num_thread)
+                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    num_thread < callbacks.max_background_threads_ &&
+                    !callbacks.background_.empty())
                 {
-                    hpx::agas::garbage_collect_non_blocking();
+                    if (callbacks.background_())
+                        idle_loop_count = 0;
                 }
 
                 // call back into invoking context
-                if (!cb_inner.empty())
-                    cb_inner();
+                if (!callbacks.inner_.empty())
+                    callbacks.inner_();
             }
 
             // something went badly wrong, give up
-            if (global_state == state_terminating)
+            if (this_state.load() == state_terminating)
                 break;
 
             if (busy_loop_count > HPX_BUSY_LOOP_COUNT_MAX)
@@ -369,28 +441,33 @@ namespace hpx { namespace threads { namespace detail
                 busy_loop_count = 0;
 
                 // do background work in parcel layer and in agas
-                if (hpx::parcelset::do_background_work(num_thread))
-                    idle_loop_count = 0;
-
-                if (0 == num_thread)
+                if ((scheduler.get_scheduler_mode() & policies::do_background_work) &&
+                    num_thread < callbacks.max_background_threads_ &&
+                    !callbacks.background_.empty())
                 {
-                    hpx::agas::garbage_collect_non_blocking();
+                    if (callbacks.background_())
+                        idle_loop_count = 0;
                 }
             }
-            else if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+            else if ((scheduler.get_scheduler_mode() & policies::fast_idle_mode) ||
+                idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
             {
-                // call back into invoking context
-                if (!cb_outer.empty())
-                    cb_outer();
-
                 // clean up terminated threads
-                idle_loop_count = 0;
+                if (idle_loop_count > HPX_IDLE_LOOP_COUNT_MAX)
+                    idle_loop_count = 0;
+
+                // call back into invoking context
+                if (!callbacks.outer_.empty())
+                    callbacks.outer_();
 
                 // break if we were idling after 'may_exit'
                 if (may_exit)
                 {
                     if (scheduler.SchedulingPolicy::cleanup_terminated(true))
+                    {
+                        this_state.store(state_stopped);
                         break;
+                    }
                     may_exit = false;
                 }
                 else

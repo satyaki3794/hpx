@@ -5,8 +5,6 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
-#include <hpx/runtime/serialization/serialize.hpp>
-#include <hpx/lcos/local/detail/invoke_when_ready.hpp>
 
 #include <hpx/include/parallel_algorithm.hpp>
 #include <hpx/include/parallel_numeric.hpp>
@@ -128,7 +126,7 @@ struct block_component
         return sub_block(&data_[offset], size);
     }
 
-    HPX_DEFINE_COMPONENT_ACTION(block_component, get_sub_block);
+    HPX_DEFINE_COMPONENT_DIRECT_ACTION(block_component, get_sub_block);
 
     std::vector<double> data_;
 };
@@ -139,16 +137,14 @@ struct block
     typedef hpx::components::client_base<block, block_component> base_type;
     block() {}
 
-    block(boost::uint64_t id, const char * base_name)
-      : base_type(hpx::find_id_from_basename(base_name, id))
+    block(hpx::future<hpx::id_type> && id)
+      : base_type(std::move(id))
     {
-        get_id();
     }
 
     block(boost::uint64_t id, boost::uint64_t size, const char * base_name)
       : base_type(hpx::new_<block_component>(hpx::find_here(), size))
     {
-        hpx::register_id_with_basename(base_name, get_id(), id);
     }
 
     hpx::future<sub_block> get_sub_block(boost::uint64_t offset, boost::uint64_t size)
@@ -172,8 +168,7 @@ typedef block_component::get_sub_block_action get_sub_block_action;
 HPX_REGISTER_ACTION(get_sub_block_action);
 
 void transpose(hpx::future<sub_block> A, hpx::future<sub_block> B,
-    hpx::future<boost::uint64_t> block_order,
-    hpx::future<boost::uint64_t> tile_size);
+    boost::uint64_t block_order, boost::uint64_t tile_size);
 double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
     boost::uint64_t blocks_end);
@@ -213,22 +208,20 @@ int hpx_main(boost::program_options::variables_map& vm)
         boost::uint64_t blocks_start = id * num_local_blocks;
         boost::uint64_t blocks_end = (id + 1) * num_local_blocks;
 
-        // Actually allocate the block components in AGAS
-        for(boost::uint64_t b = 0; b < num_blocks; ++b)
+        // First allocate and create our local blocks
+        for(boost::uint64_t b = 0; b != num_local_blocks; ++b)
         {
-            // Allocate block
-            if(b >= blocks_start && b < blocks_end)
-            {
-                A[b] = block(b, col_block_size, A_block_basename);
-                B[b] = block(b, col_block_size, B_block_basename);
-            }
-            // Retrieve the block by it's symbolic name
-            else
-            {
-                A[b] = block(b, A_block_basename);
-                B[b] = block(b, B_block_basename);
-            }
+            boost::uint64_t block_idx = b + blocks_start;
+            A[block_idx] = block(block_idx, col_block_size, A_block_basename);
+            B[block_idx] = block(block_idx, col_block_size, B_block_basename);
         }
+
+        // Find all blocks ...
+        std::cout << "Finding blocks ...\n";
+        std::vector<hpx::future<hpx::id_type> > A_ids
+            = hpx::find_all_from_basename(A_block_basename, num_blocks);
+        std::vector<hpx::future<hpx::id_type> > B_ids
+            = hpx::find_all_from_basename(B_block_basename, num_blocks);
 
         if(root)
         {
@@ -247,7 +240,6 @@ int hpx_main(boost::program_options::variables_map& vm)
         }
         using hpx::parallel::for_each;
         using hpx::parallel::par;
-        using hpx::parallel::task;
 
         // Fill the original matrix, set transpose to known garbage value.
         auto range = boost::irange(blocks_start, blocks_end);
@@ -259,17 +251,33 @@ int hpx_main(boost::program_options::variables_map& vm)
                 boost::shared_ptr<block_component> B_ptr =
                     hpx::get_ptr<block_component>(B[b].get_id()).get();
 
-                for(boost::uint64_t i = 0; i < order; ++i)
+                for(boost::uint64_t i = 0; i != order; ++i)
                 {
-                    for(boost::uint64_t j = 0; j < block_order; ++j)
+                    for(boost::uint64_t j = 0; j != block_order; ++j)
                     {
                         double col_val = COL_SHIFT * (b*block_order + j);
                         A_ptr->data_[i * block_order + j] = col_val + ROW_SHIFT * i;
                         B_ptr->data_[i * block_order + j] = -1.0;
                     }
                 }
+                hpx::register_with_basename(A_block_basename, A[b].get_id(), b);
+                hpx::register_with_basename(B_block_basename, B[b].get_id(), b);
             }
         );
+
+        hpx::wait_all(A_ids);
+        std::cout << "Finding blocks A ... done\n";
+        hpx::wait_all(B_ids);
+        std::cout << "Finding blocks B ... done\n";
+        for(boost::uint64_t b = 0; b != num_blocks; ++b)
+        {
+            // Convert the gids to clients
+            if(b < blocks_start || b >= blocks_end)
+            {
+                A[b] = block(std::move(A_ids[b]));
+                B[b] = block(std::move(B_ids[b]));
+            }
+        }
 
         double errsq = 0.0;
         double avgtime = 0.0;
@@ -282,15 +290,17 @@ int hpx_main(boost::program_options::variables_map& vm)
 
             auto range = boost::irange(blocks_start, blocks_end);
 
-            std::vector<hpx::shared_future<void> > block_futures;
+            std::vector<hpx::future<void> > block_futures;
             block_futures.resize(num_local_blocks);
 
             for_each(par, boost::begin(range), boost::end(range),
                 [&](boost::uint64_t b)
                 {
                     std::vector<hpx::future<void> > phase_futures;
-                    //phase_futures.resize(num_local_blocks);
-                    auto phase_range = boost::irange(static_cast<boost::uint64_t>(0), num_blocks);
+                    phase_futures.reserve(num_blocks);
+
+                    auto phase_range = boost::irange(
+                        static_cast<boost::uint64_t>(0), num_blocks);
                     for(boost::uint64_t phase: phase_range)
                     {
                         const boost::uint64_t block_size = block_order * block_order;
@@ -298,19 +308,20 @@ int hpx_main(boost::program_options::variables_map& vm)
                         const boost::uint64_t from_phase = b;
                         const boost::uint64_t A_offset = from_phase * block_size;
                         const boost::uint64_t B_offset = phase * block_size;
+
                         phase_futures.push_back(
                             hpx::lcos::local::dataflow(
                                 &transpose
                               , A[from_block].get_sub_block(A_offset, block_size)
                               , B[b].get_sub_block(B_offset, block_size)
-                              , hpx::make_ready_future(block_order)
-                              , hpx::make_ready_future(tile_size)
+                              , block_order
+                              , tile_size
                             )
                         );
                     }
 
                     block_futures[b - blocks_start] =
-                        hpx::when_all(phase_futures).share();
+                        hpx::when_all(phase_futures);
                 }
             );
 
@@ -389,22 +400,23 @@ int main(int argc, char* argv[])
 }
 
 void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
-    hpx::future<boost::uint64_t> block_order_fut,
-    hpx::future<boost::uint64_t> tile_size_fut)
+    boost::uint64_t block_order, boost::uint64_t tile_size)
 {
     const sub_block A(Af.get());
     sub_block B(Bf.get());
-    boost::uint64_t block_order(block_order_fut.get());
-    boost::uint64_t tile_size(tile_size_fut.get());
+
     if(tile_size < block_order)
     {
         for(boost::uint64_t i = 0; i < block_order; i += tile_size)
         {
             for(boost::uint64_t j = 0; j < block_order; j += tile_size)
             {
-                for(boost::uint64_t it = i; it < (std::min)(block_order, i + tile_size); ++it)
+                boost::uint64_t max_i = (std::min)(block_order, i + tile_size);
+                boost::uint64_t max_j = (std::min)(block_order, j + tile_size);
+
+                for(boost::uint64_t it = i; it != max_i; ++it)
                 {
-                    for(boost::uint64_t jt = j; jt < (std::min)(block_order, j + tile_size); ++jt)
+                    for(boost::uint64_t jt = j; jt != max_j; ++jt)
                     {
                         B[it + block_order * jt] = A[jt + block_order * it];
                     }
@@ -414,9 +426,9 @@ void transpose(hpx::future<sub_block> Af, hpx::future<sub_block> Bf,
     }
     else
     {
-        for(boost::uint64_t i = 0; i < block_order; ++i)
+        for(boost::uint64_t i = 0; i != block_order; ++i)
         {
-            for(boost::uint64_t j = 0; j < block_order; ++j)
+            for(boost::uint64_t j = 0; j != block_order; ++j)
             {
                 B[i + block_order * j] = A[j + block_order * i];
             }
@@ -428,7 +440,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
     std::vector<block> & trans, boost::uint64_t blocks_start,
     boost::uint64_t blocks_end)
 {
-    using hpx::parallel::for_each;
+    using hpx::parallel::transform_reduce;
     using hpx::parallel::par;
 
     // Fill the original matrix, set transpose to known garbage value.
@@ -437,7 +449,8 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
         transform_reduce(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t b) -> double
             {
-                sub_block trans_block = trans[b].get_sub_block(0, order * block_order).get();
+                sub_block trans_block =
+                    trans[b].get_sub_block(0, order * block_order).get();
                 double errsq = 0.0;
                 for(boost::uint64_t i = 0; i < order; ++i)
                 {
@@ -445,7 +458,7 @@ double test_results(boost::uint64_t order, boost::uint64_t block_order,
                     for(boost::uint64_t j = 0; j < block_order; ++j)
                     {
                         double diff = trans_block[i * block_order + j] -
-                          (col_val + ROW_SHIFT * (b * block_order + j));
+                            (col_val + ROW_SHIFT * (b * block_order + j));
                         errsq += diff * diff;
                     }
                 }

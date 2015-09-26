@@ -7,7 +7,6 @@
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_COUNT_DEC_25_2014_0207PM
 
 #include <hpx/hpx_fwd.hpp>
-#include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 
@@ -66,8 +65,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result = dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, value);
+                        algo, policy, true_(), beg, end, value);
                 }
             }
             else {
@@ -77,8 +75,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, value);
+                        algo, policy, true_(), beg, end, value);
                 }
 
                 // handle all of the full partitions
@@ -89,8 +86,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         overall_result += dispatch(traits::get_id(sit),
-                                std::forward<Algo>(algo), policy, true_(),
-                                beg, end, value);
+                            algo, policy, true_(), beg, end, value);
                     }
                 }
 
@@ -100,8 +96,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
-                            beg, end, value);
+                        algo, policy, true_(), beg, end, value);
                 }
             }
 
@@ -144,8 +139,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
-                        beg, end, value));
+                        algo, policy, forced_seq(), beg, end, value));
                 }
             }
             else {
@@ -155,8 +149,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
-                        beg, end, value));
+                        algo, policy, forced_seq(), beg, end, value));
                 }
 
                 // handle all of the full partitions
@@ -167,8 +160,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
-                            beg, end, value));
+                            algo, policy, forced_seq(), beg, end, value));
                     }
                 }
 
@@ -178,8 +170,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
-                        beg, end, value));
+                        algo, policy, forced_seq(), beg, end, value));
                 }
             }
 
@@ -268,7 +259,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result = dispatch(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, true_(),
+                        algo, policy, true_(),
                         beg, end, std::forward<F>(f));
                 }
             }
@@ -279,7 +270,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, true_(),
+                        algo, policy, true_(),
                         beg, end, std::forward<F>(f));
                 }
 
@@ -291,7 +282,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         overall_result += dispatch(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, true_(),
+                            algo, policy, true_(),
                             beg, end, std::forward<F>(f));
                     }
                 }
@@ -302,7 +293,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     overall_result += dispatch(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, true_(),
+                        algo, policy, true_(),
                         beg, end, std::forward<F>(f));
                 }
             }
@@ -346,7 +337,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
+                        algo, policy, forced_seq(),
                         beg, end, std::forward<F>(f)));
                 }
             }
@@ -357,7 +348,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
+                        algo, policy, forced_seq(),
                         beg, end, std::forward<F>(f)));
                 }
 
@@ -369,7 +360,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                     if (beg != end)
                     {
                         segments.push_back(dispatch_async(traits::get_id(sit),
-                            std::forward<Algo>(algo), policy, forced_seq(),
+                            algo, policy, forced_seq(),
                             beg, end, std::forward<F>(f)));
                     }
                 }
@@ -380,7 +371,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                 if (beg != end)
                 {
                     segments.push_back(dispatch_async(traits::get_id(sit),
-                        std::forward<Algo>(algo), policy, forced_seq(),
+                        algo, policy, forced_seq(),
                         beg, end, std::forward<F>(f)));
                 }
             }

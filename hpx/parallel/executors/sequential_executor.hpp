@@ -9,6 +9,7 @@
 #define HPX_PARALLEL_EXECUTORS_SEQUENTIAL_EXECUTOR_MAY_11_2015_1050AM
 
 #include <hpx/config.hpp>
+#include <hpx/traits/is_executor.hpp>
 #include <hpx/parallel/config/inline_namespace.hpp>
 #include <hpx/parallel/exception_list.hpp>
 #include <hpx/parallel/executors/executor_traits.hpp>
@@ -32,7 +33,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
     /// which execute in the calling thread. The sequential order is given by
     /// the lexicographical order of indices in the index space.
     ///
-    struct sequential_executor
+    struct sequential_executor : executor_tag
     {
 #if defined(DOXYGEN)
         /// Create a new sequential executor
@@ -111,22 +112,12 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v3)
                 bulk_async_execute(std::forward<F>(f), shape));
         }
 
-        std::size_t os_thread_count()
+        std::size_t processing_units_count()
         {
             return 1;
         }
         /// \endcond
     };
-
-    namespace detail
-    {
-        /// \cond NOINTERNAL
-        template <>
-        struct is_executor<sequential_executor>
-          : std::true_type
-        {};
-        /// \endcond
-    }
 }}}
 
 #endif

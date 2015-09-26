@@ -20,6 +20,7 @@ set(tests
     broadcast
     broadcast_apply
     condition_variable
+    counting_semaphore
     barrier
     fold
     future
@@ -72,6 +73,7 @@ set(future_then_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_then_executor_PARAMETERS THREADS_PER_LOCALITY 4)
 set(future_wait_PARAMETERS THREADS_PER_LOCALITY 4)
 
+set(counting_semaphore_PARAMETERS THREADS_PER_LOCALITY 4)
 set(local_barrier_PARAMETERS THREADS_PER_LOCALITY 4)
 
 set(local_latch_PARAMETERS THREADS_PER_LOCALITY 4)
@@ -133,34 +135,36 @@ if(HPX_WITH_COMPILE_ONLY_TESTS)
     set(sources
         ${compile_test}.cpp)
 
-    source_group("Source Files" FILES ${sources})
+    add_hpx_unit_compile_test(
+      "lcos"
+      ${compile_test}
+      SOURCES ${sources}
+      ${${compile_test}_FLAGS}
+      FOLDER "Tests/Unit/LCOs/CompileOnly")
 
-    if(MSVC)
-      # add dummy library for MSVC to generate a project in VS
-      add_hpx_library(${compile_test}_compile_test
-                      SOURCES ${sources}
-                      EXCLUDE_FROM_ALL
-                      FOLDER "Tests/Unit/LCOs/CompileOnly")
+    # add a custom target for this example
+    add_hpx_pseudo_target(tests.unit.lcos.${compile_test})
 
-      # add a custom target for this example
-      add_hpx_pseudo_target(tests.unit.lcos.${compile_test})
+    # make pseudo-targets depend on master pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.lcos
+                                tests.unit.lcos.${compile_test})
 
-      # make pseudo-targets depend on master pseudo-target
-      add_hpx_pseudo_dependencies(tests.unit.lcos
-                                  tests.unit.lcos.${compile_test})
+    # add dependencies to pseudo-target
+    add_hpx_pseudo_dependencies(tests.unit.lcos.${compile_test}
+                                "tests.unit.lcos.${compile_test}")
 
-      # add dependencies to pseudo-target
-      add_hpx_pseudo_dependencies(tests.unit.lcos.${compile_test}
-                                  ${compile_test}_compile_test_lib)
-    else()
-      add_hpx_unit_compile_test(
-        "lcos"
-        ${compile_test}
-        SOURCES ${sources}
-        ${${compile_test}_FLAGS}
-        FOLDER "Tests/Unit/LCOs/CompileOnly")
-      # there is no way to make this test depend on one of our pseudo targets
-    endif()
   endforeach()
 endif()
+
+#########################################################################################
+set(subdirs
+    shared_mutex
+   )
+
+# add sub directories
+foreach(subdir ${subdirs})
+  add_hpx_pseudo_target(tests.unit.lcos.${subdir}dir)
+  add_subdirectory(${subdir})
+  add_hpx_pseudo_dependencies(tests.unit.lcos tests.unit.lcos.${subdir}dir)
+endforeach()
 

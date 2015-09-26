@@ -10,6 +10,7 @@
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/runtime/naming/id_type.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
+#include <hpx/runtime/components/colocating_distribution_policy.hpp>
 #include <hpx/util/decay.hpp>
 
 #include <hpx/parallel/execution_policy.hpp>
@@ -90,7 +91,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1) { namespace detail
             return
                 detail::algorithm_result_helper<R>::call(
                     algo.call(policy, boost::mpl::true_(),
-                            segmented_local_iterator_traits<Args>::local(args)...
+                        segmented_local_iterator_traits<Args>::local(args)...
                     )
                 );
         }
