@@ -26,17 +26,31 @@
 // for non-portable format directives
 #define __STDC_FORMAT_MACROS 1
 #include <inttypes.h>
-#include "pci.h"
-#include "util.h"
-#include "error.h"
-#include "driver/apx.h"
-
-using namespace fs = boost::filesystem;
+#include <hpx/runtime/threads/policies/fpga_support/pci.hpp>
+//#include "util.h"
+#include <hpx/runtime/threads/policies/fpga_support/error.hpp>
+#include <hpx/runtime/threads/policies/fpga_support/apx.hpp>
 
 namespace PCI
 {
+// verbose printouts
+  bool verbose = false;
+
+  inline void verb(char const *fmt, ...)
+  {
+    va_list ap;
+    va_start(ap, fmt);
+
+    if (verbose)
+    {
+       vprintf(fmt, ap);
+       printf("\n");
+       fflush(stdout);
+    }
+  }
+
   // read small file
-  void Device::read(fs::path const& p, char *buf, int sz)
+  void Device::read(boost::filesystem::path const& p, char *buf, int sz)
   {
     FILE *f = fopen(p.c_str(), "r");
     if (!f)
@@ -48,10 +62,10 @@ namespace PCI
   }
 
   // fill in device info
-  void Device::get_info(fs::path const& pd)
+  void Device::get_info(boost::filesystem::path const& pd)
   {
     char s[16];
-    fs::path fn = pd/"vendor";
+    boost::filesystem::path fn = pd/"vendor";
     read(fn, s, 15);
     info_.vendor_ = strtol(s, 0, 0);
 
@@ -72,12 +86,12 @@ namespace PCI
     info_.class_ = strtol(s, 0, 0);
 
     info_.bar_mask_ = 0;
-    if (fs::is_regular_file(pd/"resource0")) info_.bar_mask_ |= 1<<0;
-    if (fs::is_regular_file(pd/"resource1")) info_.bar_mask_ |= 1<<1;
-    if (fs::is_regular_file(pd/"resource2")) info_.bar_mask_ |= 1<<2;
-    if (fs::is_regular_file(pd/"resource3")) info_.bar_mask_ |= 1<<3;
-    if (fs::is_regular_file(pd/"resource4")) info_.bar_mask_ |= 1<<4;
-    if (fs::is_regular_file(pd/"resource5")) info_.bar_mask_ |= 1<<5;
+    if (boost::filesystem::is_regular_file(pd/"resource0")) info_.bar_mask_ |= 1<<0;
+    if (boost::filesystem::is_regular_file(pd/"resource1")) info_.bar_mask_ |= 1<<1;
+    if (boost::filesystem::is_regular_file(pd/"resource2")) info_.bar_mask_ |= 1<<2;
+    if (boost::filesystem::is_regular_file(pd/"resource3")) info_.bar_mask_ |= 1<<3;
+    if (boost::filesystem::is_regular_file(pd/"resource4")) info_.bar_mask_ |= 1<<4;
+    if (boost::filesystem::is_regular_file(pd/"resource5")) info_.bar_mask_ |= 1<<5;
   }
 
   // find matching PCI device
@@ -85,11 +99,11 @@ namespace PCI
   {
     if (dev_path_.empty()) dev_path_ = SYSPATH;
 
-    if (fs::is_directory(dev_path_))
+    if (boost::filesystem::is_directory(dev_path_))
     { // device directory: iterate over devices
-      fs::directory_iterator it = fs::directory_iterator(dev_path_);
-      for (; it != fs::directory_iterator(); it++)
-        if (fs::is_directory(*it))
+      boost::filesystem::directory_iterator it = boost::filesystem::directory_iterator(dev_path_);
+      for (; it != boost::filesystem::directory_iterator(); it++)
+        if (boost::filesystem::is_directory(*it))
         {
           get_info(*it);
           if (di.vendor_ != PCI_ANY && info_.vendor_ != di.vendor_) continue;
@@ -107,9 +121,9 @@ namespace PCI
       throw RuntimeError("PCI::Device::find()",
                          "could not find the requested PCI device");
     }
-    else if (fs::is_regular_file(dev_path_))
+    else if (boost::filesystem::is_regular_file(dev_path_))
     { // direct resource path
-      if (!fs::is_regular_file(dev_path_))
+      if (!boost::filesystem::is_regular_file(dev_path_))
         throw RuntimeError("PCI::Device::find()",
                            "file %s doesn't exist", dev_path_.c_str());
       std::string base = dev_path_.filename().native();
@@ -132,12 +146,12 @@ namespace PCI
   {
     verb("Attempting to map %s", name.c_str());
     Region reg;
-    fs::path dp = dev_path_/name;
+    boost::filesystem::path dp = dev_path_/name;
     reg.fd_ = open(dp.c_str(), O_RDWR | O_SYNC);
     if (reg.fd_ < 0)
       throw RuntimeError("PCI::Device::map_region()",
                          "cannot open %s", dp.c_str());
-    reg.size_ = fs::file_size(dp);
+    reg.size_ = boost::filesystem::file_size(dp);
     reg.addr_ = mmap(0, reg.size_, PROT_READ | PROT_WRITE, MAP_SHARED, reg.fd_, 0);
     if (reg.addr_ == MAP_FAILED)
       throw RuntimeError("PCI::Device::map_region()",

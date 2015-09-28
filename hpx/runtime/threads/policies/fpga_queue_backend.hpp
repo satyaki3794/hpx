@@ -117,8 +117,9 @@ namespace hpx { namespace threads { namespace policies
 
             // make sure we have a sufficient number of queues available which
             // support a sufficiently wide word storage
-            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_NQ) > device_no_);
-            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_WSIZE) >= 64);
+            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_NQ) > 
+                static_cast<boost::uint64_t>(device_no_));
+            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_WSIZE) >= 64ul);
 
             // reset this queue
             *detail::cmd2addr(base_, device_no_, MQ_REQ_RESET) = 0;
