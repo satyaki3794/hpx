@@ -75,7 +75,7 @@ namespace hpx { namespace threads { namespace policies
         struct pci_device
         {
             pci_device()
-              : info_(),
+              : info_(0x10ee),
                 device_(info_)
             {}
 

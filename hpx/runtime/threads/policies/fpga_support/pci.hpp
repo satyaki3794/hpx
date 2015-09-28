@@ -32,8 +32,8 @@ namespace PCI
     int sub_vendor_, sub_device_;
     int bar_mask_;
 
-    DevInfo():
-      vendor_(PCI_ANY), device_(PCI_ANY), class_(PCI_ANY),
+    DevInfo(int v = PCI_ANY, int d = PCI_ANY):
+      vendor_(v), device_(d), class_(PCI_ANY),
       sub_vendor_(PCI_ANY), sub_device_(PCI_ANY), bar_mask_(0) { }
   };
 
