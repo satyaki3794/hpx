@@ -156,6 +156,7 @@ namespace PCI
     if (reg.addr_ == MAP_FAILED)
       throw RuntimeError("PCI::Device::map_region()",
                          "mmap failed for region \"%s\"", name.c_str());
+    verb("Mapped %lu bytes at %p", reg.size_, reg.addr_);
     return reg;
   }
 

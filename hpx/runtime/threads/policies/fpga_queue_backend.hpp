@@ -26,6 +26,9 @@ namespace hpx { namespace threads { namespace policies
 {
     namespace detail
     {
+        // default PCI BAR number used by APX project
+        const int DEFAULT_APX_BAR = 2;
+
         template <typename T = boost::uint64_t>
         inline T *cmd2addr(boost::uint8_t *base, int qn, unsigned cmd)
         {
@@ -42,7 +45,7 @@ namespace hpx { namespace threads { namespace policies
                   (cmd == MQ_REQ_GET_CNT) || (cmd == MQ_REQ_GET_STAT))
             );
 
-            T *addr = cmd2addr<T>(bar, queue_num, cmd);
+            volatile T *addr = cmd2addr<T>(bar, queue_num, cmd);
 
             // write to PCI memory space
             *addr = data;
@@ -61,7 +64,7 @@ namespace hpx { namespace threads { namespace policies
                 (cmd == MQ_REQ_GET_CNT) || (cmd == MQ_REQ_GET_STAT)
             );
 
-            T const*addr = cmd2addr<T>(bar, queue_num, cmd);
+            volatile T const*addr = cmd2addr<T>(bar, queue_num, cmd);
 
             // read from PCI memory space
             data = *addr;
@@ -92,16 +95,16 @@ namespace hpx { namespace threads { namespace policies
         };
 
 
-        inline PCI::Region const& get_pci_device_region()
+        inline PCI::Region const& get_pci_device_region(int bar)
         {
             pci_device& device = pci_device::get();
-            return device.device_.bar_region(device.info_.bar_mask_);
+            return device.device_.bar_region(bar);
         }
 
-        inline boost::uint8_t* get_pci_device_base()
+        inline boost::uint8_t* get_pci_device_base(int bar = DEFAULT_APX_BAR)
         {
             return reinterpret_cast<boost::uint8_t*>(
-                get_pci_device_region().addr_);
+                get_pci_device_region(bar).addr_);
         }
     }
 
