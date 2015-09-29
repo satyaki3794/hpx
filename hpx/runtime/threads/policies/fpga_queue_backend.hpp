@@ -75,7 +75,7 @@ namespace hpx { namespace threads { namespace policies
         struct pci_device
         {
             pci_device()
-              : info_(0x10ee),
+              : info_(0x10ee), // default vendor ID: Xilinx
                 device_(info_)
             {}
 
