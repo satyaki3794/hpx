@@ -120,7 +120,7 @@ namespace hpx { namespace threads { namespace policies
 
             // make sure we have a sufficient number of queues available which
             // support a sufficiently wide word storage
-            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_NQ) > 
+            HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_NQ) >
                 static_cast<boost::uint64_t>(device_no_));
             HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_WSIZE) >= 64ul);
 
@@ -235,7 +235,7 @@ namespace hpx { namespace threads { namespace policies
         fpga_queue_with_overflow_backend(
                 size_type initial_size = 0,
                 size_type num_thread = size_type(-1))
-          : fpga_queue_(num_thread),
+          : fpga_queue_(initial_size, num_thread),
             count_(0),
             fpga_queue_max_size_(fpga_queue_.max_items()),
             overflow_queue_(initial_size, num_thread)
