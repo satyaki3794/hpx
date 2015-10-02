@@ -120,7 +120,10 @@ namespace hpx { namespace threads { namespace policies
             {
                 BOOST_ASSERT(init.num_queues_ != 0);
                 for (std::size_t i = 0; i < init.num_queues_; ++i)
-                    queues_[i] = new thread_queue_type(init.max_queue_thread_count_);
+                {
+                    queues_[i] = new thread_queue_type(
+                        i, init.max_queue_thread_count_);
+                }
             }
         }
 
@@ -200,7 +203,9 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_from_pending(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_from_pending(reset);
+
                 return num_stolen_threads;
             }
 
@@ -215,11 +220,14 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_to_pending(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_to_pending(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_to_pending(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_to_pending(reset);
             return num_stolen_threads;
         }
 
@@ -229,11 +237,14 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_from_staged(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_from_staged(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_from_staged(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_from_staged(reset);
             return num_stolen_threads;
         }
 
@@ -243,11 +254,14 @@ namespace hpx { namespace threads { namespace policies
             if (num_thread == std::size_t(-1))
             {
                 for (std::size_t i = 0; i != queues_.size(); ++i)
-                    num_stolen_threads += queues_[i]->get_num_stolen_to_staged(reset);
+                    num_stolen_threads += queues_[i]->
+                        get_num_stolen_to_staged(reset);
+
                 return num_stolen_threads;
             }
 
-            num_stolen_threads += queues_[num_thread]->get_num_stolen_to_staged(reset);
+            num_stolen_threads += queues_[num_thread]->
+                get_num_stolen_to_staged(reset);
             return num_stolen_threads;
         }
 #endif
@@ -290,7 +304,7 @@ namespace hpx { namespace threads { namespace policies
             if (std::size_t(-1) == num_thread)
                 num_thread = curr_queue_++ % queue_size;
 
-            if (num_thread >= queue_size)
+            else if (num_thread >= queue_size)
                 num_thread %= queue_size;
 
             HPX_ASSERT(num_thread < queue_size);
@@ -415,10 +429,14 @@ namespace hpx { namespace threads { namespace policies
         void schedule_thread(threads::thread_data* thrd, std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+            std::size_t queue_size = queues_.size();
 
-            HPX_ASSERT(num_thread < queues_.size());
+            if (std::size_t(-1) == num_thread)
+                num_thread = curr_queue_++ % queue_size;
+
+            else if (num_thread >= queue_size)
+                num_thread %= queue_size;
+
             queues_[num_thread]->schedule_thread(thrd);
         }
 
@@ -426,10 +444,14 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread,
             thread_priority priority = thread_priority_normal)
         {
-            if (std::size_t(-1) == num_thread)
-                num_thread = curr_queue_++ % queues_.size();
+            std::size_t queue_size = queues_.size();
 
-            HPX_ASSERT(num_thread < queues_.size());
+            if (std::size_t(-1) == num_thread)
+                num_thread = curr_queue_++ % queue_size;
+
+            else if (num_thread >= queue_size)
+                num_thread %= queue_size;
+
             queues_[num_thread]->schedule_thread(thrd, true);
         }
 
@@ -709,7 +731,7 @@ namespace hpx { namespace threads { namespace policies
             if (0 == queues_[num_thread])
             {
                 queues_[num_thread] =
-                    new thread_queue_type(max_queue_thread_count_);
+                    new thread_queue_type(num_thread, max_queue_thread_count_);
             }
 
             queues_[num_thread]->on_start_thread(num_thread);
