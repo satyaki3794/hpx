@@ -1223,15 +1223,15 @@ namespace hpx
                     result = run_throttle(startup, shutdown, cfg, blocking);
                 }
 #if defined(HPX_HAVE_FPGA_QUEUES)
-                else if (0 == std::string("fpga-priority").find(cfg.queuing_))
-                {
-                    cfg.queuing_ = "fpga-priority";
-                    result = run_fpga_priority(startup, shutdown, cfg, blocking);
-                }
                 else if (0 == std::string("fpga").find(cfg.queuing_))
                 {
                     cfg.queuing_ = "fpga";
                     result = run_fpga(startup, shutdown, cfg, blocking);
+                }
+                else if (0 == std::string("fpga-priority").find(cfg.queuing_))
+                {
+                    cfg.queuing_ = "fpga-priority";
+                    result = run_fpga_priority(startup, shutdown, cfg, blocking);
                 }
 #endif
                 else {
