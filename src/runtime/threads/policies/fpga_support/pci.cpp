@@ -33,21 +33,8 @@
 
 namespace PCI
 {
-// verbose printouts
+  // verbose printouts
   bool verbose = false;
-
-  inline void verb(char const *fmt, ...)
-  {
-    va_list ap;
-    va_start(ap, fmt);
-
-    if (verbose)
-    {
-       vprintf(fmt, ap);
-       printf("\n");
-       fflush(stdout);
-    }
-  }
 
   // read small file
   void Device::read(boost::filesystem::path const& p, char *buf, int sz)

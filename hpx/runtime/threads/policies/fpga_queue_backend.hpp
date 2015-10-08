@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace policies
 
             volatile T *addr = cmd2addr<T>(bar, queue_num, cmd);
 
-            // write to PCI memory space
+            verb("writing to PCI memory space: addr(%llx), data(%llx)", addr, data);
             *addr = data;
 
             // FIXME: error handling?
@@ -66,8 +66,10 @@ namespace hpx { namespace threads { namespace policies
 
             volatile T const*addr = cmd2addr<T>(bar, queue_num, cmd);
 
-            // read from PCI memory space
+            verb("reading from PCI memory space: addr(%llx)", addr);
             data = *addr;
+
+            verb("read from PCI memory space: addr(%llx), data(%llx)", addr, data);
 
             // FIXME: error handling?
 
