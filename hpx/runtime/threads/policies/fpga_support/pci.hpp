@@ -15,6 +15,7 @@
 
 #if defined(HPX_HAVE_FPGA_QUEUES)
 #include <map>
+#include <cstdarg>
 #include <boost/filesystem.hpp>
 
 

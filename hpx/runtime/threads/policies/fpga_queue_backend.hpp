@@ -47,7 +47,7 @@ namespace hpx { namespace threads { namespace policies
 
             volatile T *addr = cmd2addr<T>(bar, queue_num, cmd);
 
-            verb("writing to PCI memory space: addr(%llx), data(%llx)", addr, data);
+            PCI::verb("writing to PCI memory space: addr(%llx), data(%llx)", addr, data);
             *addr = data;
 
             // FIXME: error handling?
@@ -66,10 +66,10 @@ namespace hpx { namespace threads { namespace policies
 
             volatile T const*addr = cmd2addr<T>(bar, queue_num, cmd);
 
-            verb("reading from PCI memory space: addr(%llx)", addr);
+            PCI::verb("reading from PCI memory space: addr(%llx)", addr);
             data = *addr;
 
-            verb("read from PCI memory space: addr(%llx), data(%llx)", addr, data);
+            PCI::verb("read from PCI memory space: addr(%llx), data(%llx)", addr, data);
 
             // FIXME: error handling?
 
@@ -77,9 +77,11 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
+        inline boost::uint8_t* get_pci_device_base(int bar = DEFAULT_APX_BAR);
+
         struct pci_device
         {
-            pci_device()
+            pci_device(int bar = DEFAULT_APX_BAR)
               : info_(0x10ee), // default vendor ID: Xilinx
                 device_(info_)
             {}
@@ -103,7 +105,7 @@ namespace hpx { namespace threads { namespace policies
             return device.device_.bar_region(bar);
         }
 
-        inline boost::uint8_t* get_pci_device_base(int bar = DEFAULT_APX_BAR)
+        inline boost::uint8_t* get_pci_device_base(int bar)
         {
             return reinterpret_cast<boost::uint8_t*>(
                 get_pci_device_region(bar).addr_);
@@ -120,14 +122,15 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(0 != base_);
             HPX_ASSERT(boost::uint64_t(-1) != device_no);
 
+            // reset this queue
+            PCI::verb("performing global reset: addr(%llx)", base);
+            *detail::cmd2addr(base_, device_no_, MQ_REQ_RESET) = 0;
+
             // make sure we have a sufficient number of queues available which
             // support a sufficiently wide word storage
             HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_NQ) >
                 static_cast<boost::uint64_t>(device_no_));
             HPX_ASSERT(*detail::cmd2addr(base_, 0, MQ_REQ_GET_WSIZE) >= 64ul);
-
-            // reset this queue
-            *detail::cmd2addr(base_, device_no_, MQ_REQ_RESET) = 0;
         }
 
         bool push_left(boost::uint64_t data)
