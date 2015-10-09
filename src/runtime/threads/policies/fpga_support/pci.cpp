@@ -34,7 +34,7 @@
 namespace PCI
 {
   // verbose printouts
-  bool verbose = false;
+  bool verbose = true;
 
   // read small file
   void Device::read(boost::filesystem::path const& p, char *buf, int sz)

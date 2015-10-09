@@ -123,7 +123,8 @@ namespace hpx { namespace threads { namespace policies
             HPX_ASSERT(boost::uint64_t(-1) != device_no);
 
             // reset this queue
-            PCI::verb("performing global reset: addr(%llx)", base);
+            PCI::verb("performing reset: addr(%llx)",
+                detail::cmd2addr(base_, device_no_, MQ_REQ_RESET));
             *detail::cmd2addr(base_, device_no_, MQ_REQ_RESET) = 0;
 
             // make sure we have a sufficient number of queues available which
