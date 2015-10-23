@@ -13,6 +13,7 @@
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/util/runtime_configuration.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/parcelhandler.hpp>
 #include <hpx/runtime/parcelset/static_parcelports.hpp>
@@ -89,7 +90,7 @@ namespace hpx { namespace parcelset
             util::get_entry_as<int>(cfg, "hpx.parcel.message_handlers", "0") != 0
         ),
         count_routed_(0),
-        write_handler_(&parcelhandler::default_write_handler)
+        write_handler_(&default_write_handler)
     {
         for (plugins::parcelport_factory_base* factory : get_parcelport_factories())
         {
@@ -347,7 +348,7 @@ namespace hpx { namespace parcelset
 
     namespace detail
     {
-        void parcel_sent_handler(parcelhandler::write_handler_type f,
+        void parcel_sent_handler(parcelhandler::write_handler_type && f,
             boost::system::error_code const & ec, parcel const & p)
         {
             // inform termination detection of a sent message
@@ -365,11 +366,35 @@ namespace hpx { namespace parcelset
     {
         HPX_ASSERT(resolver_);
 
-        // properly initialize parcel
-        init_parcel(p);
-
         naming::id_type const* ids = p.destinations();
         naming::address* addrs = p.addrs();
+
+        // During bootstrap this is handled separately (see
+        // addressing_service::resolve_locality.
+        if (0 == hpx::threads::get_self_ptr() && !hpx::is_starting())
+        {
+            HPX_ASSERT(resolver_);
+            naming::gid_type locality =
+                naming::get_locality_from_gid(ids[0].get_gid());
+            if (!resolver_->has_resolved_locality(locality))
+            {
+                // reschedule request as an HPX thread to avoid hangs
+                void (parcelhandler::*put_parcel_ptr) (
+                        parcel p, write_handler_type f
+                    ) = &parcelhandler::put_parcel;
+
+                threads::register_thread_nullary(
+                    util::bind(
+                        util::one_shot(put_parcel_ptr), this,
+                        std::move(p), std::move(f)),
+                    "parcelhandler::put_parcel", threads::pending, true,
+                    threads::thread_priority_boost);
+                return;
+            }
+        }
+
+        // properly initialize parcel
+        init_parcel(p);
 
         bool resolved_locally = true;
 
@@ -403,7 +428,8 @@ namespace hpx { namespace parcelset
         using util::placeholders::_1;
         using util::placeholders::_2;
         write_handler_type wrapped_f =
-            util::bind(&detail::parcel_sent_handler, std::move(f), _1, _2);
+            util::bind(util::one_shot(&detail::parcel_sent_handler),
+                std::move(f), _1, _2);
 
         // If we were able to resolve the address(es) locally we send the
         // parcel directly to the destination.
@@ -448,8 +474,8 @@ namespace hpx { namespace parcelset
 
     ///////////////////////////////////////////////////////////////////////////
     // default callback for put_parcel
-    void parcelhandler::default_write_handler(
-        boost::system::error_code const& ec, parcel const& p)
+    void default_write_handler(boost::system::error_code const& ec,
+        parcel const& p)
     {
         if (ec) {
             // If we are in a stopped state, ignore some errors
@@ -468,7 +494,7 @@ namespace hpx { namespace parcelset
             // all unhandled exceptions terminate the whole application
             boost::exception_ptr exception =
                 hpx::detail::get_exception(hpx::exception(ec),
-                    "parcelhandler::default_write_handler", __FILE__,
+                    "default_write_handler", __FILE__,
                     __LINE__, parcelset::dump_parcel(p));
 
             hpx::report_error(exception);

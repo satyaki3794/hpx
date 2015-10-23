@@ -405,6 +405,9 @@ namespace hpx { namespace util
                   "number of the node this locality is run on "
                   "(must be unique, alternatively: -0, -1, ..., -9)")
                 ("hpx:ignore-batch-env", "ignore batch environment variables")
+                ("hpx:expect-connecting-localities",
+                  "this locality expects other localities to dynamically connect "
+                  "(implied if the number of initial localities is larger than 1)")
 #if defined(HPX_HAVE_HWLOC) || defined(BOOST_WINDOWS)
                 ("hpx:pu-offset", value<std::size_t>(),
                   "the first processing unit this instance of HPX should be "
@@ -534,13 +537,21 @@ namespace hpx { namespace util
                   "print the performance counter(s) specified with --hpx:print-counter "
                   "in a given format (default: normal)")
                 ("hpx:csv-header",
-                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "with header when format specified with --hpx:print-counter-format"
                   "is csv or csv-short")
                 ("hpx:no-csv-header",
-                  "print the performance counter(s) specified with --hpx:print-counter"
+                  "print the performance counter(s) specified with --hpx:print-counter "
                   "without header when format specified with --hpx:print-counter-format"
                   "is csv or csv-short")
+                ("hpx:print-counter-at",
+                    value<std::vector<std::string> >()->composing(),
+                  "print the performance counter(s) specified with "
+                  "--hpx:print-counter at the given point in time, possible "
+                  "argument values: 'startup', 'shutdown' (default), 'noshutdown'")
+                ("hpx:reset-counters",
+                  "reset the performance counter(s) specified with --hpx:print-counter "
+                  "after they have been evaluated")
             ;
 
             hidden_options.add_options()
