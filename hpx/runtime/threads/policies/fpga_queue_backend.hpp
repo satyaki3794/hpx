@@ -268,6 +268,14 @@ namespace hpx { namespace threads { namespace policies
             }
 
             bool result = fpga_queue_.pop(val, steal);
+            if (0 == val)
+            {
+                // attempt to pull from an empty queue
+                ++count_;
+
+                // some other thread has already popped the value
+                return false;
+            }
 
             // Move one item from the overflow queue into the hardware queue,
             // if possible.
