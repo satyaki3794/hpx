@@ -15,6 +15,7 @@
 
 #if defined(HPX_HAVE_FPGA_QUEUES)
 #include <map>
+#include <cstdarg>
 #include <boost/filesystem.hpp>
 
 
@@ -25,6 +26,20 @@
 
 namespace PCI
 {
+  inline void verb(char const *fmt, ...)
+  {
+    // verbose printouts
+    extern bool verbose;
+    if (verbose)
+    {
+      va_list ap;
+      va_start(ap, fmt);
+      vprintf(fmt, ap);
+      printf("\n");
+      fflush(stdout);
+    }
+  }
+
   // device parameters
   struct DevInfo
   {
