@@ -26,10 +26,11 @@
 
 namespace PCI
 {
+  extern bool verbose;
+
   inline void verb(char const *fmt, ...)
   {
     // verbose printouts
-    extern bool verbose;
     if (verbose)
     {
       va_list ap;

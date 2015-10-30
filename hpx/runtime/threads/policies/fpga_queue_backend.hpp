@@ -10,6 +10,7 @@
 #include <hpx/config.hpp>
 
 #if defined(HPX_HAVE_FPGA_QUEUES)
+#include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/static.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
@@ -84,7 +85,10 @@ namespace hpx { namespace threads { namespace policies
             pci_device(int bar = DEFAULT_APX_BAR)
               : info_(0x10ee), // default vendor ID: Xilinx
                 device_(info_)
-            {}
+            {
+                extern bool PCI::verbose;
+                PCI::verbose = hpx::get_config_entry("hpx.pci.verbose", 0) != 0;
+            }
 
             struct tag {};
 
