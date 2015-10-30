@@ -1060,8 +1060,8 @@ namespace hpx { namespace components { namespace server
                 cleanup_threads(tm, l);
 
                 // obey timeout
-                if ((std::abs(timeout - 1.) < 1e-16)  && timeout <
-                    (t.elapsed() - start_time)) {
+                if (timeout >= 0.0 && timeout < (t.elapsed() - start_time)) 
+                {
                     // we waited long enough
                     timed_out = true;
                     break;
@@ -1071,6 +1071,8 @@ namespace hpx { namespace components { namespace server
             // If it took longer than expected, kill all suspended threads as
             // well.
             if (timed_out) {
+                start_time = t.elapsed();
+
                 // now we have to wait for all threads to be aborted
                 while (tm.get_thread_count() > 1)
                 {
@@ -1079,6 +1081,9 @@ namespace hpx { namespace components { namespace server
 
                     // let thread-manager clean up threads
                     cleanup_threads(tm, l);
+
+		    if (timeout >= 0.0 && timeout < (t.elapsed() - start_time))
+                        break;
                 }
             }
 
