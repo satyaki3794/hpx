@@ -19,6 +19,7 @@
 #include <hpx/runtime/applier/applier.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/naming/name.hpp>
+#include <hpx/util/function.hpp>
 
 #include <boost/make_shared.hpp>
 #include <boost/cache/entries/lfu_entry.hpp>
@@ -321,6 +322,10 @@ public:
     parcelset::endpoints_type const& resolve_locality(
         naming::gid_type const & gid
       , error_code& ec = throws
+        );
+
+    bool has_resolved_locality(
+        naming::gid_type const & gid
         );
 
     /// \brief Remove a locality from the runtime.
