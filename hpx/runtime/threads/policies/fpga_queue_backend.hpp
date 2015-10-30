@@ -86,8 +86,7 @@ namespace hpx { namespace threads { namespace policies
               : info_(0x10ee), // default vendor ID: Xilinx
                 device_(info_)
             {
-                extern bool PCI::verbose;
-                PCI::verbose = hpx::get_config_entry("hpx.pci.verbose", 0) != 0;
+                PCI::verbose = hpx::get_config_entry("hpx.pci.verbose", 0) != "0";
             }
 
             struct tag {};
