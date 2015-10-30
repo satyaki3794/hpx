@@ -89,7 +89,7 @@ namespace hpx { namespace threads { namespace policies
                 PCI::verbose = hpx::get_config_entry("hpx.pci.verbose", 0) != "0";
             }
 
-            static boost::uint8_t* construct()
+            static void construct()
             {
                 static pci_device pcidevice;
                 base_ = reinterpret_cast<boost::uint8_t*>(
@@ -105,10 +105,13 @@ namespace hpx { namespace threads { namespace policies
 
             PCI::DevInfo info_;
             PCI::Device device_;
-            boost::uint8_t* base_;
 
+            static boost::uint8_t* base_;
             static boost::once_flag constructed_;
         };
+
+        template <typename Dummy>
+        boost::uint8_t* pci_device<Dummy>::base_ = 0;
 
         template <typename Dummy>
         boost::once_flag pci_device<Dummy>::constructed_ = BOOST_ONCE_INIT;
