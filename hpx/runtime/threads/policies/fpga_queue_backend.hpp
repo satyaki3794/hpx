@@ -12,7 +12,7 @@
 #if defined(HPX_HAVE_FPGA_QUEUES)
 #include <hpx/runtime/get_config_entry.hpp>
 #include <hpx/util/assert.hpp>
-#include <hpx/util/static.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/runtime/threads/policies/lockfree_queue_backends.hpp>
 
 #include <hpx/runtime/threads/policies/fpga_support/pci.hpp>
@@ -22,6 +22,7 @@
 #include <boost/static_assert.hpp>
 #include <boost/atomic/atomic.hpp>
 #include <boost/type_traits/is_same.hpp>
+#include <boost/thread/once.hpp>
 
 namespace hpx { namespace threads { namespace policies
 {
@@ -78,48 +79,46 @@ namespace hpx { namespace threads { namespace policies
         }
 
         ///////////////////////////////////////////////////////////////////////
-        inline boost::uint8_t* get_pci_device_base(int bar = DEFAULT_APX_BAR);
-
+        template <typename Dummy = int>
         struct pci_device
         {
-            pci_device(int bar = DEFAULT_APX_BAR)
+            pci_device()
               : info_(0x10ee), // default vendor ID: Xilinx
                 device_(info_)
             {
                 PCI::verbose = hpx::get_config_entry("hpx.pci.verbose", 0) != "0";
             }
 
-            struct tag {};
-
-            static pci_device& get()
+            static boost::uint8_t* construct()
             {
-                util::static_<pci_device, pci_device::tag> pcidevice;
-                return pcidevice.get();
+                static pci_device pcidevice;
+                base_ = reinterpret_cast<boost::uint8_t*>(
+                    pcidevice.device_.bar_region(DEFAULT_APX_BAR).addr_);
+            }
+
+            static boost::uint8_t* base()
+            {
+                boost::call_once(&pci_device::construct, constructed_);
+                HPX_ASSERT(0 != base_);
+                return base_;
             }
 
             PCI::DevInfo info_;
             PCI::Device device_;
+            boost::uint8_t* base_;
+
+            static boost::once_flag constructed_;
         };
 
-
-        inline PCI::Region const& get_pci_device_region(int bar)
-        {
-            pci_device& device = pci_device::get();
-            return device.device_.bar_region(bar);
-        }
-
-        inline boost::uint8_t* get_pci_device_base(int bar)
-        {
-            return reinterpret_cast<boost::uint8_t*>(
-                get_pci_device_region(bar).addr_);
-        }
+        template <typename Dummy>
+        boost::once_flag pci_device<Dummy>::constructed_ = BOOST_ONCE_INIT;
     }
 
     ///////////////////////////////////////////////////////////////////////////
     struct fpga_queue
     {
         fpga_queue(boost::uint64_t device_no)
-          : base_(detail::get_pci_device_base()),
+          : base_(detail::pci_device<>::base()),
             device_no_(static_cast<int>(device_no))
         {
             HPX_ASSERT(0 != base_);
