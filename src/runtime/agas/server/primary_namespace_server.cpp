@@ -400,7 +400,7 @@ response primary_namespace::begin_migration(
         std::forward_as_tuple(id), std::forward_as_tuple());
 #else
     migrating_objects_.insert(migration_table_type::value_type(
-        id, boost::make_shared<lcos::local::condition_variable>()));
+        id, boost::make_shared<lcos::local::condition_variable_any>()));
 #endif
 
     return response(primary_ns_begin_migration, at_c<0>(r), at_c<1>(r), at_c<2>(r));

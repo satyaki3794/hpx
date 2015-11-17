@@ -138,12 +138,12 @@ struct HPX_EXPORT primary_namespace
     gva_table_type gvas_;
     refcnt_table_type refcnts_;
 #if !defined(HPX_GCC_VERSION) || HPX_GCC_VERSION >= 408000
-    typedef std::map<naming::gid_type, lcos::local::condition_variable>
+    typedef std::map<naming::gid_type, lcos::local::condition_variable_any>
         migration_table_type;
 #else
     typedef std::map<
             naming::gid_type
-          , boost::shared_ptr<lcos::local::condition_variable>
+          , boost::shared_ptr<lcos::local::condition_variable_any>
         > migration_table_type;
 #endif
 
