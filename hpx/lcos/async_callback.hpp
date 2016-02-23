@@ -14,7 +14,6 @@
 #include <hpx/lcos/async_callback_fwd.hpp>
 
 #include <boost/utility/enable_if.hpp>
-#include <boost/static_assert.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace detail
@@ -28,7 +27,7 @@ namespace hpx { namespace detail
     {
         // id_type
         template <typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -44,7 +43,7 @@ namespace hpx { namespace detail
 
         template <typename Client, typename Stub, typename Callback,
             typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -58,9 +57,10 @@ namespace hpx { namespace detail
             typedef typename components::client_base<
                     Client, Stub
                 >::server_component_type component_type;
-            BOOST_STATIC_ASSERT(
-                traits::is_valid_action<Action, component_type>::value
-            );
+
+            typedef traits::is_valid_action<Action, component_type> is_valid;
+            static_assert(is_valid::value,
+                "The action to invoke is not supported by the target");
 
             return hpx::detail::async_cb_impl<Action>(launch_policy,
                 c.get_id(), std::forward<Callback>(cb),
@@ -69,7 +69,7 @@ namespace hpx { namespace detail
 
         // distribution policy
         template <typename DistPolicy, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         typename boost::enable_if_c<
             traits::is_distribution_policy<DistPolicy>::value,
             lcos::future<
@@ -93,7 +93,7 @@ namespace hpx { namespace detail
     struct async_cb_action_dispatch<Action, naming::id_type>
     {
         template <typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -118,7 +118,7 @@ namespace hpx { namespace detail
     {
         template <typename Client_, typename Stub, typename Callback,
             typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -131,9 +131,10 @@ namespace hpx { namespace detail
             typedef typename components::client_base<
                     Client_, Stub
                 >::server_component_type component_type;
-            BOOST_STATIC_ASSERT(
-                traits::is_valid_action<Action, component_type>::value
-            );
+
+            typedef traits::is_valid_action<Action, component_type> is_valid;
+            static_assert(is_valid::value,
+                "The action to invoke is not supported by the target");
 
             return async_cb_action_dispatch<
                     Action, BOOST_SCOPED_ENUM(launch)
@@ -150,7 +151,7 @@ namespace hpx { namespace detail
         >::type>
     {
         template <typename DistPolicy, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -170,7 +171,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     template <typename Action, typename F, typename ...Ts>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     auto async_cb(F && f, Ts &&... ts)
     ->  decltype(detail::async_cb_action_dispatch<
                 Action, typename util::decay<F>::type
@@ -194,7 +195,7 @@ namespace hpx { namespace detail
     {
         template <typename Component, typename Signature, typename Derived,
             typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -210,7 +211,7 @@ namespace hpx { namespace detail
 
         template <typename Component, typename Signature, typename Derived,
             typename Client, typename Stub, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -224,9 +225,10 @@ namespace hpx { namespace detail
             typedef typename components::client_base<
                     Client, Stub
                 >::server_component_type component_type;
-            BOOST_STATIC_ASSERT(
-                traits::is_valid_action<Derived, component_type>::value
-            );
+
+            typedef traits::is_valid_action<Derived, component_type> is_valid;
+            static_assert(is_valid::value,
+                "The action to invoke is not supported by the target");
 
             return async_cb<Derived>(c.get_id(), std::forward<Callback>(cb),
                 std::forward<Ts>(ts)...);
@@ -234,7 +236,7 @@ namespace hpx { namespace detail
 
         template <typename Component, typename Signature, typename Derived,
             typename DistPolicy, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -257,7 +259,7 @@ namespace hpx { namespace detail
     {
         template <typename Component, typename Signature, typename Derived,
             typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -274,7 +276,7 @@ namespace hpx { namespace detail
 
         template <typename Component, typename Signature, typename Derived,
             typename Client, typename Stub, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -289,9 +291,10 @@ namespace hpx { namespace detail
             typedef typename components::client_base<
                     Client, Stub
                 >::server_component_type component_type;
-            BOOST_STATIC_ASSERT(
-                traits::is_valid_action<Derived, component_type>::value
-            );
+
+            typedef traits::is_valid_action<Derived, component_type> is_valid;
+            static_assert(is_valid::value,
+                "The action to invoke is not supported by the target");
 
             return async_cb<Derived>(launch_policy, c.get_id(),
                 std::forward<Callback>(cb), std::forward<Ts>(ts)...);
@@ -299,7 +302,7 @@ namespace hpx { namespace detail
 
         template <typename Component, typename Signature, typename Derived,
             typename DistPolicy, typename Callback, typename ...Ts>
-        BOOST_FORCEINLINE static
+        HPX_FORCEINLINE static
         lcos::future<
             typename traits::promise_local_result<
                 typename traits::extract_action<
@@ -319,7 +322,7 @@ namespace hpx { namespace detail
 namespace hpx
 {
     template <typename F, typename ...Ts>
-    BOOST_FORCEINLINE
+    HPX_FORCEINLINE
     auto async_cb(F && f, Ts &&... ts)
     ->  decltype(detail::async_cb_dispatch<
                 typename util::decay<F>::type
