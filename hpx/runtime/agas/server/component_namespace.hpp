@@ -9,7 +9,7 @@
 #if !defined(HPX_A16135FC_AA32_444F_BB46_549AD456A661)
 #define HPX_A16135FC_AA32_444F_BB46_549AD456A661
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/agas/request.hpp>
 #include <hpx/runtime/agas/response.hpp>

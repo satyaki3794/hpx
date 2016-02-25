@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM)
 #define HPX_PARALLEL_ALGORITHM_INNER_PRODUCT_JUL_15_2015_0730AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/zip_iterator.hpp>
 

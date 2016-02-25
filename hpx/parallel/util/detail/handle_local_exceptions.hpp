@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_DETAIL_HANDLE_LOCAL_EXCEPTIONS_OCT_03_2014_0142PM)
 #define HPX_PARALLEL_UTIL_DETAIL_HANDLE_LOCAL_EXCEPTIONS_OCT_03_2014_0142PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/util/move.hpp>

@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM)
 #define HPX_PARALLEL_DETAIL_REDUCE_JUN_01_2014_0903AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/unwrapped.hpp>
 

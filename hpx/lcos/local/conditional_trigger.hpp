@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM)
 #define HPX_LCOS_LOCAL_CONDITIONAL_TRIGGER_SEP_09_2012_1256PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/local/promise.hpp>

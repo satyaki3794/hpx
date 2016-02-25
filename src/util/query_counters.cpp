@@ -3,9 +3,10 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/agas/interface.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
+#include <hpx/util_fwd.hpp>
 #include <hpx/util/assert.hpp>
 #include <hpx/util/query_counters.hpp>
 #include <hpx/util/high_resolution_clock.hpp>

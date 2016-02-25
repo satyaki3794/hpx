@@ -13,7 +13,7 @@
 
 #include <mpi.h>
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <cstdlib>
 
 namespace hpx { namespace util

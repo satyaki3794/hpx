@@ -7,11 +7,14 @@
 #if !defined(HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM)
 #define HPX_RUNTIME_RUNTIME_JUN_10_2008_1012AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/applier_fwd.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/static_reinit.hpp>

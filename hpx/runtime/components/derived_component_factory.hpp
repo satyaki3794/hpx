@@ -8,7 +8,7 @@
 #define HPX_DERIVED_COMPONENT_FACTORY_NOV_05_2008_1209PM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/components/unique_component_name.hpp>

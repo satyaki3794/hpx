@@ -7,10 +7,11 @@
 #if !defined(HPX_RUNTIME_RUNTIME_IMPL_HPP)
 #define HPX_RUNTIME_RUNTIME_IMPL_HPP
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/util/io_service_pool.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/naming/resolver_client.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>

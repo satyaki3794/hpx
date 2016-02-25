@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM)
 #define HPX_PARALLEL_UTIL_LOOP_MAY_27_2014_1040PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/util/cancellation_token.hpp>
 
 #include <iterator>

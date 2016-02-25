@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_CANCELLATION_TOKEN_OCT_05_1205PM)
 #define HPX_PARALLEL_UTIL_CANCELLATION_TOKEN_OCT_05_1205PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <algorithm>
 

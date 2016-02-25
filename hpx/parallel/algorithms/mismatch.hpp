@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM)
 #define HPX_PARALLEL_DETAIL_MISMATCH_JUL_13_2014_0142PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>

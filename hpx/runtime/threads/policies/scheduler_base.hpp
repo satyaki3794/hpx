@@ -8,6 +8,7 @@
 
 #include <hpx/config.hpp>
 #include <hpx/state.hpp>
+#include <hpx/runtime/parcelset_fwd.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>

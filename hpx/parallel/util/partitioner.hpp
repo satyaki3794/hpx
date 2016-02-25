@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM)
 #define HPX_PARALLEL_UTIL_PARTITIONER_MAY_27_2014_1040PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/async.hpp>
 #include <hpx/exception_list.hpp>
 #include <hpx/lcos/wait_all.hpp>

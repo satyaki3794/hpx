@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM)
 #define HPX_PARALLEL_ALGORITHM_SET_UNION_MAR_06_2015_1028AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/decay.hpp>

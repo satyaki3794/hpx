@@ -10,7 +10,7 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_MPI)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>

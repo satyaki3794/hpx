@@ -9,7 +9,7 @@
 #if !defined(HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21)
 #define HPX_BDD56092_8F07_4D37_9987_37D20A1FEA21
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/agas/request.hpp>

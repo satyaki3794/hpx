@@ -4,12 +4,14 @@
 //  Distributed under the Boost Software License, Version 1.0. (See accompanying
 //  file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
-#include <hpx/hpx_fwd.hpp>
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/state.hpp>
 #include <hpx/version.hpp>
 #include <hpx/runtime.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
+#include <hpx/runtime/get_locality_id.hpp>
+#include <hpx/runtime/get_worker_thread_num.hpp>
 #include <hpx/runtime/naming/name.hpp>
 #include <hpx/runtime/threads/threadmanager.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
@@ -22,8 +24,10 @@
 #  include <unistd.h>
 #endif
 
-#include <boost/format.hpp>
 #include <boost/atomic.hpp>
+#include <boost/format.hpp>
+#include <boost/make_shared.hpp>
+#include <boost/shared_ptr.hpp>
 
 #include <stdexcept>
 #include <algorithm>

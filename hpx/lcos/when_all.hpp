@@ -134,7 +134,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/future.hpp>
 #include <hpx/lcos/when_some.hpp>
 #include <hpx/util/always_void.hpp>

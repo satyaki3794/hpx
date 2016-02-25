@@ -8,9 +8,10 @@
 #if !defined(HPX_START_OCT_04_2012_0148PM)
 #define HPX_START_OCT_04_2012_0148PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/hpx_finalize.hpp>
 #include <hpx/hpx_user_main_config.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 
 #include <boost/program_options.hpp>
 #include <boost/lexical_cast.hpp>

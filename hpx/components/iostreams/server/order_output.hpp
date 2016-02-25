@@ -6,7 +6,7 @@
 #if !defined(HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM)
 #define HPX_IOSTREAMS_SERVER_ORDER_OUTPUT_JUL_18_2014_0711PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/components/iostreams/server/buffer.hpp>
 #include <hpx/util/unlock_guard.hpp>
 

@@ -7,7 +7,7 @@
 #if !defined(HPX_97FC0FA2_E773_4F83_8477_806EC68C2253)
 #define HPX_97FC0FA2_E773_4F83_8477_806EC68C2253
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/state.hpp>
 #include <hpx/include/client.hpp>
 #include <hpx/components/iostreams/manipulators.hpp>

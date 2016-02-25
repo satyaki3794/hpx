@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM)
 #define HPX_LCOS_SERVER_LATCH_APR_19_2015_0956AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/lcos/base_lco_with_value.hpp>
 #include <hpx/lcos/local/latch.hpp>

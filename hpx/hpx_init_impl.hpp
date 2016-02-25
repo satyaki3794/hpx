@@ -8,6 +8,8 @@
 #define HPX_INIT_IMPL_OCT_04_2012_0123PM
 
 #include <hpx/hpx_init.hpp>
+#include <hpx/runtime_fwd.hpp>
+#include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/util/bind.hpp>
 #include <hpx/util/find_prefix.hpp>
 

@@ -17,7 +17,7 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_IPC)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/plugins/parcelport/ipc/data_buffer.hpp>
 #include <hpx/util/assert.hpp>
 

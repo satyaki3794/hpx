@@ -7,7 +7,7 @@
 #define HPX_BINARY_FILTER_FACTORY_MAR_24_2013_0347PM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/plugins/unique_plugin_name.hpp>
 #include <hpx/plugins/plugin_registry.hpp>

@@ -9,7 +9,7 @@
 #include <hpx/config/defines.hpp>
 #if defined(HPX_HAVE_PARCELPORT_IBVERBS)
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/plugins/parcelport/ibverbs/ibverbs_errors.hpp>
 #include <hpx/plugins/parcelport/ibverbs/helper.hpp>
 #include <hpx/plugins/parcelport/ibverbs/client.hpp>

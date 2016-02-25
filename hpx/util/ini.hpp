@@ -10,6 +10,7 @@
 
 #include <map>
 #include <iostream>
+#include <vector>
 
 #include <hpx/runtime/serialization/serialization_fwd.hpp>
 

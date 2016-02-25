@@ -7,7 +7,7 @@
 #if !defined(HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E)
 #define HPX_1A262552_0D65_4C7D_887E_D11B02AAAC7E
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 #include <hpx/util/assert.hpp>

@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM)
 #define HPX_PARALLEL_DETAIL_FILL_JUNE_12_2014_0405PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/void_guard.hpp>
 #include <hpx/util/move.hpp>
 

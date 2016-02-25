@@ -95,7 +95,7 @@ namespace hpx
 
 #else // DOXYGEN
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/when_each.hpp>
 #include <hpx/util/detail/pack.hpp>
 

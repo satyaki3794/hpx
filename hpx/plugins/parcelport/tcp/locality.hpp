@@ -14,7 +14,7 @@
 #if defined(HPX_HAVE_PARCELPORT_TCP)
 
 #include <hpx/config/asio.hpp>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/util/safe_bool.hpp>

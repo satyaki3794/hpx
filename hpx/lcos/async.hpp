@@ -6,7 +6,7 @@
 #if !defined(HPX_LCOS_ASYNC_SEP_28_2011_0840AM)
 #define HPX_LCOS_ASYNC_SEP_28_2011_0840AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/traits/is_distribution_policy.hpp>
 #include <hpx/traits/is_launch_policy.hpp>
 #include <hpx/runtime/launch_policy.hpp>

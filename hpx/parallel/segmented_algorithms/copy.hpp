@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM)
 #define HPX_PARALLEL_SEGMENTED_ALGORITHM_COPY_JAN_05_2014_0125PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 

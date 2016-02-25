@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM)
 #define HPX_PARALLEL_DETAIL_FIND_JULY_16_2014_0213PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/parallel/execution_policy.hpp>
 #include <hpx/parallel/algorithms/detail/predicates.hpp>
 #include <hpx/parallel/algorithms/detail/dispatch.hpp>

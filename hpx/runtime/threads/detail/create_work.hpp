@@ -6,7 +6,7 @@
 #if !defined(HPX_RUNTIME_THREADS_DETAIL_CREATE_WORK_JAN_13_2013_0526PM)
 #define HPX_RUNTIME_THREADS_DETAIL_CREATE_WORK_JAN_13_2013_0526PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/threads/thread_data.hpp>
 #include <hpx/runtime/threads/thread_init_data.hpp>

@@ -10,7 +10,7 @@
 #if !defined(HPX_LCOS_LOCAL_ONCE_JAN_03_2013_0810PM)
 #define HPX_LCOS_LOCAL_ONCE_JAN_03_2013_0810PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/config/emulate_deleted.hpp>
 #include <hpx/lcos/local/event.hpp>
 #include <hpx/lcos/local/once_fwd.hpp>

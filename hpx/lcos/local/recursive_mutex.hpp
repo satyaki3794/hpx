@@ -10,7 +10,7 @@
 #if !defined(HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM)
 #define HPX_LCOS_RECURSIVE_MUTEX_AUG_03_2009_0459PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <boost/atomic.hpp>

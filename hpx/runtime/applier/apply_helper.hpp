@@ -7,7 +7,7 @@
 #if !defined(HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM)
 #define HPX_APPLIER_APPLY_HELPER_JUN_25_2008_0917PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/runtime/naming/address.hpp>
 #include <hpx/runtime/applier/applier.hpp>

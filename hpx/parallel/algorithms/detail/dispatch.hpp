@@ -6,7 +6,7 @@
 #if !defined(HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM)
 #define HPX_PARALLEL_DISPATCH_JUN_25_2014_1145PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/traits/segmented_iterator_traits.hpp>
 #include <hpx/util/move.hpp>

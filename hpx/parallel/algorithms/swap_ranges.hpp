@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM)
 #define HPX_PARALLEL_DETAIL_SWAP_RANGES_JUNE_20_2014_1006AM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

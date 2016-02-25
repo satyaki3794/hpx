@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15)
 #define HPX_PARALLEL_ALGORITHM_ADJACENT_DIF_JUL_15
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 #include <hpx/util/zip_iterator.hpp>
 

@@ -8,7 +8,7 @@
 #define HPX_COMPONENT_REGISTRY_MAR_10_2010_0720PM
 
 #include <hpx/config.hpp>
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <hpx/runtime/components/unique_component_name.hpp>
 #include <hpx/runtime/components/component_registry_base.hpp>

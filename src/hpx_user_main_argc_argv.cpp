@@ -5,6 +5,7 @@
 
 #include <hpx/hpx_init.hpp>
 #include <hpx/exception.hpp>
+#include <hpx/runtime/get_config_entry.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Forwarding of hpx_startup::user_main, if necessary. This has to be in a

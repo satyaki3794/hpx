@@ -8,7 +8,7 @@
 #if !defined(HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM)
 #define HPX_PARALLEL_ALGORITH_INCLUDES_MAR_10_2015_0737PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 #include <hpx/util/move.hpp>
 
 #include <hpx/parallel/config/inline_namespace.hpp>

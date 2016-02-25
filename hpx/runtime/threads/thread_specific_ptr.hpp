@@ -11,7 +11,7 @@
 #if !defined(HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM)
 #define HPX_UTIL_RUNTIME_THREADS_THREAD_SPECIFIC_PTR_MAR_20_2014_0941A320PM
 
-#include <hpx/hpx_fwd.hpp>
+#include <hpx/config.hpp>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
