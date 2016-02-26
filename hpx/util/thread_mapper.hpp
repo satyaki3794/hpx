@@ -9,6 +9,7 @@
 #include <hpx/config.hpp>
 #include <hpx/exception.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
+#include <hpx/util/function.hpp>
 
 #include <map>
 #include <vector>
@@ -17,7 +18,6 @@
 #include <boost/thread/thread.hpp>
 #include <boost/noncopyable.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/function.hpp>
 #include <boost/bimap.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
@@ -30,7 +30,7 @@ namespace hpx { namespace util
     {
     public:
         // type for callback function invoked when thread is unregistered
-        typedef boost::function1<bool, boost::uint32_t> callback_type;
+        typedef function_nonser<bool(boost::uint32_t)> callback_type;
 
         // erroneous thread index
         static boost::uint32_t invalid_index;
