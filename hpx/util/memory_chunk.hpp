@@ -11,6 +11,8 @@
 
 #include <boost/thread/locks.hpp>
 
+#include <memory>
+
 namespace hpx { namespace util
 {
     template <typename Mutex>
@@ -262,7 +264,7 @@ namespace hpx { namespace util
         }
 
         mutable mutex_type mtx_;
-        boost::shared_ptr<data_type> data_;
+        std::shared_ptr<data_type> data_;
         size_type const chunk_size_;
         size_type allocated_;
         iterator current_;

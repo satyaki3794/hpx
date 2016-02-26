@@ -15,7 +15,7 @@
 #include <hpx/plugins/parcelport/mpi/locality.hpp>
 #include <hpx/util/high_resolution_clock.hpp>
 
-#include <boost/shared_ptr.hpp>
+#include <memory>
 
 namespace hpx { namespace parcelset { namespace policies { namespace mpi
 {
@@ -23,7 +23,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
     struct sender_connection;
 
     int acquire_tag(sender *);
-    void add_connection(sender *, boost::shared_ptr<sender_connection> const&);
+    void add_connection(sender *, std::shared_ptr<sender_connection> const&);
 
     struct sender_connection
       : parcelset::parcelport_connection<
@@ -295,7 +295,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             void(
                 error_code const&
               , parcelset::locality const&
-              , boost::shared_ptr<sender_connection>
+              , std::shared_ptr<sender_connection>
             )
         > postprocess_handler_;
 

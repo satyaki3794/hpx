@@ -12,7 +12,6 @@
 #include <hpx/util/bind.hpp>
 
 #include <boost/thread/locks.hpp>
-#include <boost/make_shared.hpp>
 
 namespace hpx { namespace util { namespace detail
 {
@@ -272,7 +271,7 @@ namespace hpx { namespace util
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
-      : timer_(boost::make_shared<detail::interval_timer>(
+      : timer_(std::make_shared<detail::interval_timer>(
             f, microsecs, description, pre_shutdown))
     {}
 
@@ -280,14 +279,14 @@ namespace hpx { namespace util
             util::function_nonser<void()> const& on_term,
             boost::int64_t microsecs, std::string const& description,
             bool pre_shutdown)
-      : timer_(boost::make_shared<detail::interval_timer>(
+      : timer_(std::make_shared<detail::interval_timer>(
             f, on_term, microsecs, description, pre_shutdown))
     {}
 
     interval_timer::interval_timer(util::function_nonser<bool()> const& f,
             util::steady_duration const& rel_time,
             char const*  description, bool pre_shutdown)
-      : timer_(boost::make_shared<detail::interval_timer>(
+      : timer_(std::make_shared<detail::interval_timer>(
             f, rel_time.value().count() / 1000, description, pre_shutdown))
     {}
 
@@ -295,7 +294,7 @@ namespace hpx { namespace util
             util::function_nonser<void()> const& on_term,
             util::steady_duration const& rel_time,
             char const*  description, bool pre_shutdown)
-      : timer_(boost::make_shared<detail::interval_timer>(
+      : timer_(std::make_shared<detail::interval_timer>(
             f, on_term, rel_time.value().count() / 1000, description,
             pre_shutdown))
     {}

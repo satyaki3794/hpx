@@ -13,8 +13,7 @@
 
 #include <hpx/hpx_fwd.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+#include <memory>
 
 namespace hpx { namespace threads
 {
@@ -52,13 +51,13 @@ namespace hpx { namespace threads
             void (*cleanup_function)(T*);
         };
 
-        boost::shared_ptr<cleanup_function> cleanup_;
+        std::shared_ptr<cleanup_function> cleanup_;
 
     public:
         typedef T element_type;
 
         thread_specific_ptr()
-          : cleanup_(boost::make_shared<delete_data>())
+          : cleanup_(std::make_shared<delete_data>())
         {}
 
         explicit thread_specific_ptr(void (*func_)(T*))
@@ -93,7 +92,7 @@ namespace hpx { namespace threads
         {
             T* const temp = get();
             util::coroutines::detail::set_tss_data(
-                this, boost::shared_ptr<cleanup_function>());
+                this, std::shared_ptr<cleanup_function>());
             return temp;
         }
         void reset(T* new_value = 0)

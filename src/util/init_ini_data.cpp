@@ -14,6 +14,7 @@
 
 #include <string>
 #include <iostream>
+#include <memory>
 #include <algorithm>
 #include <vector>
 
@@ -244,7 +245,7 @@ namespace hpx { namespace util
             for (std::string const& s : names)
             {
                 // create the component registry object
-                boost::shared_ptr<components::component_registry_base>
+                std::shared_ptr<components::component_registry_base>
                     registry (pf.create(s, ec));
                 if (ec) continue;
 
@@ -290,7 +291,7 @@ namespace hpx { namespace util
             for (std::string const& s : names)
             {
                 // create the component registry object
-                boost::shared_ptr<components::component_registry_base>
+                std::shared_ptr<components::component_registry_base>
                     registry (pf.create(s, ec));
                 if (ec) return;
 
@@ -304,11 +305,11 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     load_plugin_factory(hpx::util::plugin::dll& d, util::section& ini,
         std::string const& curr, std::string const& name, error_code& ec)
     {
-        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             plugin_list_type;
 
         plugin_list_type plugin_registries;
@@ -326,7 +327,7 @@ namespace hpx { namespace util
             for (std::string const& s : names)
             {
                 // create the plugin registry object
-                boost::shared_ptr<plugins::plugin_registry_base>
+                std::shared_ptr<plugins::plugin_registry_base>
                     registry(pf.create(s, ec));
                 if (ec) continue;
 
@@ -359,7 +360,7 @@ namespace hpx { namespace util
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     init_ini_data_default(std::string const& libs, util::section& ini,
         std::map<std::string, boost::filesystem::path>& basenames,
         std::map<std::string, hpx::util::plugin::dll>& modules)
@@ -369,7 +370,7 @@ namespace hpx { namespace util
         typedef std::vector<std::pair<fs::path, std::string> >::iterator
             iterator_type;
 
-        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             plugin_list_type;
 
         plugin_list_type plugin_registries;

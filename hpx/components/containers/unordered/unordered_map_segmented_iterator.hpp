@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <iterator>
 #include <limits>
+#include <memory>
 #include <type_traits>
 
 #include <boost/integer.hpp>
@@ -208,7 +209,7 @@ namespace hpx
 //         }
 //
 //     private:
-//         boost::shared_ptr<server::partitioned_vector<T> > data_;
+//         std::shared_ptr<server::partitioned_vector<T> > data_;
 //         predicate predicate_;
 //         BaseIter end_;
 //     };

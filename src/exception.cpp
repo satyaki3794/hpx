@@ -31,6 +31,7 @@
 #include <iostream>
 #endif
 #include <sstream>
+#include <memory>
 
 #ifdef __APPLE__
 #include <crt_externs.h>
@@ -112,11 +113,11 @@ namespace hpx { namespace detail
 
     ///////////////////////////////////////////////////////////////////////////
     template <typename Exception>
-    inline boost::shared_ptr<boost::exception>
+    inline std::shared_ptr<boost::exception>
     make_exception_ptr(Exception const& e)
     {
-        return boost::static_pointer_cast<boost::exception>(
-            boost::make_shared<Exception>(e));
+        return std::static_pointer_cast<boost::exception>(
+            std::make_shared<Exception>(e));
     }
 
     ///////////////////////////////////////////////////////////////////////////

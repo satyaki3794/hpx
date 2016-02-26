@@ -30,10 +30,10 @@
 #include <hpx/util/logging/detail/manipulator.hpp>
 #include <hpx/util/logging/format/destination/convert_destination.hpp>
 #include <boost/config.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <fstream>
+#include <memory>
 
 namespace hpx { namespace util { namespace logging { namespace destination {
 
@@ -90,7 +90,7 @@ namespace detail {
         }
 
         std::string name;
-        boost::shared_ptr< std::basic_ofstream<char_type> > out;
+        std::shared_ptr< std::basic_ofstream<char_type> > out;
         file_settings settings;
     };
 }

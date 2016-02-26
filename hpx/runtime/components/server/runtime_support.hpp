@@ -32,12 +32,12 @@
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition.hpp>
 #include <boost/thread/locks.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/atomic.hpp>
 #include <boost/mpl/bool.hpp>
 
 #include <map>
+#include <memory>
 #include <list>
 #include <set>
 
@@ -63,18 +63,18 @@ namespace hpx { namespace components { namespace server
             component_factory() : isenabled(false) {}
 
             component_factory(
-                  boost::shared_ptr<component_factory_base> const& f,
+                  std::shared_ptr<component_factory_base> const& f,
                   hpx::util::plugin::dll const& d, bool enabled = true)
               : first(f), second(d), isenabled(enabled)
             {};
 
             component_factory(
-                  boost::shared_ptr<component_factory_base> const& f,
+                  std::shared_ptr<component_factory_base> const& f,
                   bool enabled = true)
               : first(f), isenabled(enabled)
             {};
 
-            boost::shared_ptr<component_factory_base> first;
+            std::shared_ptr<component_factory_base> first;
             hpx::util::plugin::dll second;
             bool isenabled;
         };
@@ -84,12 +84,12 @@ namespace hpx { namespace components { namespace server
         struct plugin_factory
         {
             plugin_factory(
-                  boost::shared_ptr<plugins::plugin_factory_base> const& f,
+                  std::shared_ptr<plugins::plugin_factory_base> const& f,
                   hpx::util::plugin::dll const& d, bool enabled)
               : first(f), second(d), isenabled(enabled)
             {}
 
-            boost::shared_ptr<plugins::plugin_factory_base> first;
+            std::shared_ptr<plugins::plugin_factory_base> first;
             hpx::util::plugin::dll const& second;
             bool isenabled;
         };
@@ -159,11 +159,11 @@ namespace hpx { namespace components { namespace server
 
         template <typename Component>
         naming::gid_type copy_create_component(
-            boost::shared_ptr<Component> const& p, bool);
+            std::shared_ptr<Component> const& p, bool);
 
         template <typename Component>
         naming::gid_type migrate_component_to_here(
-            boost::shared_ptr<Component> const& p, naming::id_type);
+            std::shared_ptr<Component> const& p, naming::id_type);
 
         /// \brief Action to create new memory block
         naming::gid_type create_memory_block(std::size_t count,
@@ -334,7 +334,7 @@ namespace hpx { namespace components { namespace server
 #endif
 
         ///////////////////////////////////////////////////////////////////////
-        boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
             components::component_type type);
 
     protected:
@@ -463,7 +463,7 @@ namespace hpx { namespace components { namespace server
         }
 
         naming::gid_type id;
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             id = factory->create();
@@ -508,7 +508,7 @@ namespace hpx { namespace components { namespace server
         }
 
         naming::gid_type id;
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
@@ -560,7 +560,7 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::gid_type> ids;
         ids.reserve(count);
 
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             for (std::size_t i = 0; i != count; ++i)
@@ -612,7 +612,7 @@ namespace hpx { namespace components { namespace server
         std::vector<naming::gid_type> ids;
         ids.reserve(count);
 
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
             for (std::size_t i = 0; i != count; ++i)
@@ -633,7 +633,7 @@ namespace hpx { namespace components { namespace server
 
     template <typename Component>
     naming::gid_type runtime_support::copy_create_component(
-        boost::shared_ptr<Component> const& p, bool local_op)
+        std::shared_ptr<Component> const& p, bool local_op)
     {
         components::component_type const type =
             components::get_component_type<
@@ -666,7 +666,7 @@ namespace hpx { namespace components { namespace server
         }
 
         naming::gid_type id;
-        boost::shared_ptr<component_factory_base> factory((*it).second.first);
+        std::shared_ptr<component_factory_base> factory((*it).second.first);
         {
             util::unlock_guard<boost::unique_lock<component_map_mutex_type> > ul(l);
 
@@ -689,13 +689,13 @@ namespace hpx { namespace components { namespace server
     ///////////////////////////////////////////////////////////////////////////
     template <typename Component>
     naming::gid_type runtime_support::migrate_component_to_here(
-        boost::shared_ptr<Component> const& p, naming::id_type to_migrate)
+        std::shared_ptr<Component> const& p, naming::id_type to_migrate)
     {
         components::component_type const type =
             components::get_component_type<
                 typename Component::wrapped_type>();
 
-        boost::shared_ptr<component_factory_base> factory;
+        std::shared_ptr<component_factory_base> factory;
         naming::gid_type migrated_id;
 
         {
@@ -907,7 +907,7 @@ namespace hpx { namespace components { namespace server
     struct copy_create_component_action
       : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
-                boost::shared_ptr<Component> const&, bool)
+                std::shared_ptr<Component> const&, bool)
           , &runtime_support::copy_create_component<Component>
           , copy_create_component_action<Component> >
     {};
@@ -915,7 +915,7 @@ namespace hpx { namespace components { namespace server
     struct migrate_component_here_action
       : ::hpx::actions::action<
             naming::gid_type (runtime_support::*)(
-                boost::shared_ptr<Component> const&, naming::id_type)
+                std::shared_ptr<Component> const&, naming::id_type)
           , &runtime_support::migrate_component_to_here<Component>
           , migrate_component_here_action<Component> >
     {};

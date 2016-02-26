@@ -24,6 +24,7 @@
 #include <boost/preprocessor/cat.hpp>
 
 #include <iostream>
+#include <memory>
 #include <tuple>
 #include <vector>
 #include <string>
@@ -493,7 +494,7 @@ namespace hpx
         {}
 
         // Return the pinned pointer to the underlying component
-        boost::shared_ptr<server::partitioned_vector<T> > get_ptr() const
+        std::shared_ptr<server::partitioned_vector<T> > get_ptr() const
         {
             error_code ec(lightweight);
             return hpx::get_ptr<server::partitioned_vector<T> >(

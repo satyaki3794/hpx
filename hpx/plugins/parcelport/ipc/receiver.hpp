@@ -21,11 +21,11 @@
 
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/asio/placeholders.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include <memory>
 
 namespace hpx { namespace parcelset { namespace policies { namespace ipc
 {
@@ -56,12 +56,12 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         /// Get the data window associated with the receiver.
         data_window& window() { return window_; }
 
-        boost::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(),
+        std::shared_ptr<parcel_buffer_type> get_buffer(parcel const & p = parcel(),
             std::size_t arg_size = 0)
         {
             if(!buffer_ || (buffer_ && !buffer_->parcels_decoded_))
             {
-                buffer_ = boost::make_shared<parcel_buffer_type>(buffer_type());
+                buffer_ = std::make_shared<parcel_buffer_type>(buffer_type());
             }
             buffer_->data_.reset();
             return buffer_;
@@ -150,8 +150,8 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
     };
 
     // this makes sure we can store our connections in a set
-    inline bool operator<(boost::shared_ptr<receiver> const& lhs,
-        boost::shared_ptr<receiver> const& rhs)
+    inline bool operator<(std::shared_ptr<receiver> const& lhs,
+        std::shared_ptr<receiver> const& rhs)
     {
         return lhs.get() < rhs.get();
     }

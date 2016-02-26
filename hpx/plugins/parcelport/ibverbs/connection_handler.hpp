@@ -19,6 +19,8 @@
 
 #include <hpx/util/memory_chunk_pool.hpp>
 
+#include <memory>
+
 namespace hpx { namespace parcelset {
     namespace policies { namespace ibverbs
     {
@@ -79,7 +81,7 @@ namespace hpx { namespace parcelset {
 
             void background_work();
 
-            boost::shared_ptr<sender> create_connection(
+            std::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
             parcelset::locality agas_locality(util::runtime_configuration const & ini)
@@ -87,7 +89,7 @@ namespace hpx { namespace parcelset {
 
             parcelset::locality create_locality() const;
 
-            void add_sender(boost::shared_ptr<sender> const& sender_connection);
+            void add_sender(std::shared_ptr<sender> const& sender_connection);
 
             ibv_pd *get_pd(ibv_context *context, boost::system::error_code & ec);
 
@@ -132,11 +134,11 @@ namespace hpx { namespace parcelset {
             acceptor acceptor_;
 
             hpx::lcos::local::spinlock receivers_mtx_;
-            typedef std::list<boost::shared_ptr<receiver> > receivers_type;
+            typedef std::list<std::shared_ptr<receiver> > receivers_type;
             receivers_type receivers_;
 
             hpx::lcos::local::spinlock senders_mtx_;
-            typedef std::list<boost::shared_ptr<sender> > senders_type;
+            typedef std::list<std::shared_ptr<sender> > senders_type;
             senders_type senders_;
 
             boost::atomic<bool> stopped_;

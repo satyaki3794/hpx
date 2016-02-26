@@ -23,6 +23,8 @@
 #include <boost/preprocessor/stringize.hpp>
 #include <boost/detail/atomic_count.hpp>
 
+#include <memory>
+
 ///////////////////////////////////////////////////////////////////////////////
 namespace hpx { namespace components
 {
@@ -170,14 +172,14 @@ namespace hpx { namespace components
         }
 #endif
 
-        boost::shared_ptr<util::one_size_heap_list_base> get_heap() const
+        std::shared_ptr<util::one_size_heap_list_base> get_heap() const
         {
             return heap_;
         }
 
     protected:
         component_type type_;
-        boost::shared_ptr<util::one_size_heap_list_base> heap_;
+        std::shared_ptr<util::one_size_heap_list_base> heap_;
     };
 }}
 

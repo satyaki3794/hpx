@@ -23,10 +23,6 @@
 #include <boost/fusion/include/at_c.hpp>
 #include <boost/thread/locks.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#include <boost/make_shared.hpp>
-#endif
-
 #include <list>
 
 namespace hpx { namespace agas
@@ -396,7 +392,7 @@ response primary_namespace::begin_migration(
                 id,
                 hpx::util::make_tuple(
                     false, 0,
-                    boost::make_shared<lcos::local::condition_variable>()
+                    std::make_shared<lcos::local::condition_variable>()
                 )
             ));
 #endif

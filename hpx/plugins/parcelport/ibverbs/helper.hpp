@@ -12,6 +12,8 @@
 #include <boost/cache/entries/lru_entry.hpp>
 #include <boost/cache/local_cache.hpp>
 
+#include <memory>
+
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
 
@@ -103,7 +105,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
                 boost::system::error_code err(verrno, boost::system::system_category());
                 HPX_IBVERBS_THROWS(err);
             }
-            mr_ = boost::shared_ptr<ibv_mr>(mr, deleter);
+            mr_ = std::shared_ptr<ibv_mr>(mr, deleter);
         }
 
         void reset()
@@ -111,7 +113,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs {
             mr_.reset();
         }
 
-        boost::shared_ptr<ibv_mr> mr_;
+        std::shared_ptr<ibv_mr> mr_;
     };
 
 }}}}

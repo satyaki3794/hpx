@@ -30,11 +30,8 @@
 #include <boost/fusion/include/vector.hpp>
 #include <boost/thread/locks.hpp>
 
-#if defined(HPX_GCC_VERSION) && HPX_GCC_VERSION < 408000
-#include <boost/shared_ptr.hpp>
-#endif
-
 #include <map>
+#include <memory>
 
 namespace hpx { namespace agas
 {
@@ -148,7 +145,7 @@ struct HPX_EXPORT primary_namespace
             naming::gid_type,
             hpx::util::tuple<
                 bool, std::size_t,
-                boost::shared_ptr<lcos::local::condition_variable>
+                std::shared_ptr<lcos::local::condition_variable>
             >
         > migration_table_type;
 #endif

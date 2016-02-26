@@ -10,6 +10,8 @@
 #include <hpx/util/coroutine/detail/tss.hpp>
 #include <hpx/runtime/threads/scheduler_specific_ptr.hpp>
 
+#include <memory>
+
 namespace hpx { namespace threads { namespace detail
 {
     void* get_tss_data(void const* key)
@@ -27,7 +29,7 @@ namespace hpx { namespace threads { namespace detail
     }
 
     void set_tss_data(void const* key,
-        boost::shared_ptr<util::coroutines::detail::tss_cleanup_function> const& func,
+        std::shared_ptr<util::coroutines::detail::tss_cleanup_function> const& func,
         void* tss_data, bool cleanup_existing)
     {
 #if defined(HPX_HAVE_SCHEDULER_LOCAL_STORAGE)

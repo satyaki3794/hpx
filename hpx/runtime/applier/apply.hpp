@@ -30,7 +30,6 @@
 #include <boost/dynamic_bitset.hpp>
 #endif
 #include <boost/format.hpp>
-#include <boost/make_shared.hpp>
 
 #include <vector>
 #include <map>

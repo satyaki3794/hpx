@@ -8,6 +8,8 @@
 
 #include <boost/cstdint.hpp>
 
+#include <memory>
+
 namespace hpx { namespace lcos { namespace local {
 
 void run_composable(guard_task *task);
@@ -33,8 +35,8 @@ void free(guard_task *task) {
     delete task;
 }
 
-bool sort_guard(boost::shared_ptr<guard> const& l1,
-        boost::shared_ptr<guard> const& l2) {
+bool sort_guard(std::shared_ptr<guard> const& l1,
+        std::shared_ptr<guard> const& l2) {
     return boost::get_pointer(l1) < boost::get_pointer(l2);
 }
 
@@ -51,7 +53,7 @@ struct stage_data : public DebugObject {
     util::function_nonser<void()> task;
     guard_task **stages;
     stage_data(util::function_nonser<void()> task_,
-        std::vector<boost::shared_ptr<guard> >& guards);
+        std::vector<std::shared_ptr<guard> >& guards);
     ~stage_data() {
         delete[] stages;
         stages = NULL;
@@ -115,7 +117,7 @@ void stage_task(stage_data *sd,std::size_t i,std::size_t n) {
 
 
 stage_data::stage_data(util::function_nonser<void()> task_,
-        std::vector<boost::shared_ptr<guard> >& guards)
+        std::vector<std::shared_ptr<guard> >& guards)
   : task(task_), stages(new guard_task*[guards.size()])
 {
     const std::size_t n = guards.size();

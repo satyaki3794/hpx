@@ -29,6 +29,8 @@
 #include <boost/spirit/include/qi_alternative.hpp>
 #include <boost/spirit/include/qi_sequence.hpp>
 
+#include <memory>
+
 #if defined(HPX_WINDOWS)
 #  include <process.h>
 #elif defined(HPX_HAVE_UNISTD_H)
@@ -336,10 +338,10 @@ namespace hpx { namespace util
     }
 
     // load information about dynamically discovered plugins
-    std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+    std::vector<std::shared_ptr<plugins::plugin_registry_base> >
     runtime_configuration::load_modules()
     {
-        typedef std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        typedef std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             plugin_list_type;
 
         namespace fs = boost::filesystem;

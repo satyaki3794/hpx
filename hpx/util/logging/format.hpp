@@ -28,10 +28,11 @@
 #include <hpx/util/logging/format_fwd.hpp>
 #include <hpx/util/logging/format/op_equal.hpp>
 #include <hpx/util/logging/format/array.hpp>
-#include <vector>
-#include <set>
-#include <boost/shared_ptr.hpp>
+
 #include <boost/type_traits/is_base_of.hpp>
+
+#include <set>
+#include <vector>
 
 namespace hpx { namespace util { namespace logging {
 

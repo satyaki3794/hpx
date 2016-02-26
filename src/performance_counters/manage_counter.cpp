@@ -10,6 +10,8 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 
+#include <memory>
+
 namespace hpx { namespace performance_counters
 {
     counter_status manage_counter::install(naming::id_type const& id,
@@ -38,7 +40,7 @@ namespace hpx { namespace performance_counters
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    inline void counter_shutdown(boost::shared_ptr<manage_counter> const& p)
+    inline void counter_shutdown(std::shared_ptr<manage_counter> const& p)
     {
         HPX_ASSERT(p);
         p->uninstall();
@@ -47,7 +49,7 @@ namespace hpx { namespace performance_counters
     void install_counter(naming::id_type const& id, counter_info const& info,
         error_code& ec)
     {
-        boost::shared_ptr<manage_counter> p = boost::make_shared<manage_counter>();
+        std::shared_ptr<manage_counter> p = std::make_shared<manage_counter>();
 
         // Install the counter instance.
         p->install(id, info, ec);

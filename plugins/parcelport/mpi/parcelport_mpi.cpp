@@ -35,6 +35,8 @@
 
 #include <boost/archive/basic_archive.hpp>
 
+#include <memory>
+
 namespace hpx
 {
     bool is_starting();
@@ -77,7 +79,7 @@ namespace hpx { namespace parcelset
             return s->acquire_tag();
         }
 
-        void add_connection(sender * s, boost::shared_ptr<sender_connection> const &ptr)
+        void add_connection(sender * s, std::shared_ptr<sender_connection> const &ptr)
         {
             s->add(ptr);
         }
@@ -151,7 +153,7 @@ namespace hpx { namespace parcelset
                 return util::mpi_environment::get_processor_name();
             }
 
-            boost::shared_ptr<sender_connection> create_connection(
+            std::shared_ptr<sender_connection> create_connection(
                 parcelset::locality const& l, error_code& ec)
             {
                 int dest_rank = l.get<locality>().rank();

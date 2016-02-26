@@ -17,6 +17,7 @@
 #include <hpx/plugins/parcelport/ipc/data_buffer_cache.hpp>
 #include <hpx/plugins/parcelport/ipc/locality.hpp>
 
+#include <memory>
 
 namespace hpx { namespace parcelset {
     namespace policies { namespace ipc
@@ -76,7 +77,7 @@ namespace hpx { namespace parcelset {
             /// Stop the handling of connections.
             void do_stop();
 
-            boost::shared_ptr<sender> create_connection(
+            std::shared_ptr<sender> create_connection(
                 parcelset::locality const& l, error_code& ec);
 
             parcelset::locality agas_locality(util::runtime_configuration const & ini)
@@ -87,9 +88,9 @@ namespace hpx { namespace parcelset {
         private:
             // helper functions for receiving parcels
             void handle_accept(boost::system::error_code const& e,
-                boost::shared_ptr<receiver>);
+                std::shared_ptr<receiver>);
             void handle_read_completion(boost::system::error_code const& e,
-                boost::shared_ptr<receiver>);
+                std::shared_ptr<receiver>);
 
             /// Acceptor used to listen for incoming connections.
             acceptor* acceptor_;
@@ -99,7 +100,7 @@ namespace hpx { namespace parcelset {
             data_buffer_cache data_buffer_cache_;
 
             /// The list of accepted connections
-            typedef std::set<boost::shared_ptr<receiver> > accepted_connections_set;
+            typedef std::set<std::shared_ptr<receiver> > accepted_connections_set;
             accepted_connections_set accepted_connections_;
         };
     }}

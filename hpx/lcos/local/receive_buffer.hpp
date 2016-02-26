@@ -14,10 +14,9 @@
 #include <hpx/util/assert.hpp>
 #include <hpx/util/move.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/thread/locks.hpp>
 
+#include <memory>
 #include <utility>
 #include <map>
 
@@ -61,7 +60,7 @@ namespace hpx { namespace lcos { namespace local
             bool can_be_deleted_;
         };
 
-        typedef std::map<std::size_t, boost::shared_ptr<entry_data> >
+        typedef std::map<std::size_t, std::shared_ptr<entry_data> >
             buffer_map_type;
         typedef typename buffer_map_type::iterator iterator;
 
@@ -121,7 +120,7 @@ namespace hpx { namespace lcos { namespace local
 
         void store_received(std::size_t step, T && val)
         {
-            boost::shared_ptr<entry_data> entry;
+            std::shared_ptr<entry_data> entry;
 
             {
                 boost::lock_guard<mutex_type> l(mtx_);
@@ -157,7 +156,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 std::pair<iterator, bool> res =
                     buffer_map_.insert(
-                        std::make_pair(step, boost::make_shared<entry_data>()));
+                        std::make_pair(step, std::make_shared<entry_data>()));
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,
@@ -211,7 +210,7 @@ namespace hpx { namespace lcos { namespace local
             bool can_be_deleted_;
         };
 
-        typedef std::map<std::size_t, boost::shared_ptr<entry_data> >
+        typedef std::map<std::size_t, std::shared_ptr<entry_data> >
             buffer_map_type;
         typedef typename buffer_map_type::iterator iterator;
 
@@ -271,7 +270,7 @@ namespace hpx { namespace lcos { namespace local
 
         void store_received(std::size_t step)
         {
-            boost::shared_ptr<entry_data> entry;
+            std::shared_ptr<entry_data> entry;
 
             {
                 boost::lock_guard<mutex_type> l(mtx_);
@@ -307,7 +306,7 @@ namespace hpx { namespace lcos { namespace local
             {
                 std::pair<iterator, bool> res =
                     buffer_map_.insert(
-                        std::make_pair(step, boost::make_shared<entry_data>()));
+                        std::make_pair(step, std::make_shared<entry_data>()));
                 if (!res.second)
                 {
                     HPX_THROW_EXCEPTION(invalid_status,

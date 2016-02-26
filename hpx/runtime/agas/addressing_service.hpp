@@ -24,7 +24,6 @@
 #include <hpx/util/function.hpp>
 #include <hpx/util/unique_function.hpp>
 
-#include <boost/make_shared.hpp>
 #include <boost/cache/lru_cache.hpp>
 #include <boost/cache/statistics/local_full_statistics.hpp>
 #include <boost/cstdint.hpp>
@@ -33,6 +32,7 @@
 #include <boost/thread/locks.hpp>
 
 #include <map>
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace util
@@ -76,7 +76,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     typedef std::map<naming::gid_type, boost::int64_t> refcnt_requests_type;
 
     mutable mutex_type gva_cache_mtx_;
-    boost::shared_ptr<gva_cache_type> gva_cache_;
+    std::shared_ptr<gva_cache_type> gva_cache_;
 
     mutable mutex_type migrated_objects_mtx_;
     migrated_objects_table_type migrated_objects_table_;
@@ -90,7 +90,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     std::size_t refcnt_requests_count_;
     bool enable_refcnt_caching_;
 
-    boost::shared_ptr<refcnt_requests_type> refcnt_requests_;
+    std::shared_ptr<refcnt_requests_type> refcnt_requests_;
 
     service_mode const service_type;
     runtime_mode const runtime_type;
@@ -102,7 +102,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
     boost::uint64_t rts_lva_;
     boost::uint64_t mem_lva_;
 
-    boost::shared_ptr<detail::agas_service_client> client_;
+    std::shared_ptr<detail::agas_service_client> client_;
 
     boost::atomic<hpx::state> state_;
     naming::gid_type locality_;
@@ -220,7 +220,7 @@ struct HPX_EXPORT addressing_service : boost::noncopyable
 
 protected:
     void launch_bootstrap(
-        boost::shared_ptr<parcelset::parcelport> const& pp
+        std::shared_ptr<parcelset::parcelport> const& pp
       , parcelset::endpoints_type const & endpoints
       , util::runtime_configuration const& ini_
         );

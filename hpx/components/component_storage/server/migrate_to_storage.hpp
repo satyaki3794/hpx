@@ -15,6 +15,8 @@
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
 
+#include <memory>
+
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -56,7 +58,7 @@ namespace hpx { namespace components { namespace server
         template <typename Component>
         naming::id_type migrate_to_storage_here_cleanup(
             future<naming::id_type> f,
-            boost::shared_ptr<Component> ptr,
+            std::shared_ptr<Component> ptr,
             naming::id_type const& to_migrate)
         {
             ptr->mark_as_migrated();
@@ -66,7 +68,7 @@ namespace hpx { namespace components { namespace server
         // trigger the actual migration to storage
         template <typename Component>
         future<naming::id_type> migrate_to_storage_here_postproc(
-            boost::shared_ptr<Component> const& ptr,
+            std::shared_ptr<Component> const& ptr,
             naming::id_type const& to_migrate,
             naming::id_type const& target_storage)
         {
@@ -132,7 +134,7 @@ namespace hpx { namespace components { namespace server
         }
 
         // retrieve pointer to object (must be local)
-        boost::shared_ptr<Component> ptr =
+        std::shared_ptr<Component> ptr =
             hpx::detail::get_ptr_for_migration<Component>(addr, to_migrate);
 
         // perform actual migration by sending data over to target locality

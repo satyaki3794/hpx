@@ -24,12 +24,12 @@
 #include <hpx/lcos/local/spinlock.hpp>
 
 #include <map>
+#include <memory>
 #include <list>
 #include <stdexcept>
 #include <string>
 
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/thread/locks.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,7 +45,7 @@ namespace hpx { namespace util
     public:
         typedef hpx::lcos::local::spinlock mutex_type;
 
-        typedef boost::shared_ptr<Connection> connection_type;
+        typedef std::shared_ptr<Connection> connection_type;
         typedef std::deque<connection_type> value_type;
         typedef Key key_type;
         typedef std::list<key_type> key_tracker_type;

@@ -161,14 +161,13 @@ namespace hpx
 #include <hpx/util/detail/pp_strip_parens.hpp>
 
 #include <boost/atomic.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/fusion/include/for_each.hpp>
 #include <boost/fusion/include/is_sequence.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/utility/enable_if.hpp>
 
 #include <algorithm>
 #include <iterator>
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,7 +260,7 @@ namespace hpx { namespace lcos
         }
 
         template <typename Sequence>
-        struct wait_some : boost::enable_shared_from_this<wait_some<Sequence> > //-V690
+        struct wait_some : std::enable_shared_from_this<wait_some<Sequence> > //-V690
         {
         private:
             void on_future_ready(threads::thread_id_type const& id)
@@ -368,8 +367,8 @@ namespace hpx { namespace lcos
             std::back_inserter(lazy_values_),
             detail::wait_get_shared_state<Future>());
 
-        boost::shared_ptr<detail::wait_some<result_type> > f =
-            boost::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type> > f =
+            std::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
@@ -412,8 +411,8 @@ namespace hpx { namespace lcos
         std::transform(begin, end, std::back_inserter(lazy_values_),
             detail::wait_get_shared_state<future_type>());
 
-        boost::shared_ptr<detail::wait_some<result_type> > f =
-            boost::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type> > f =
+            std::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
@@ -437,8 +436,8 @@ namespace hpx { namespace lcos
         for (std::size_t i = 0; i != count; ++i)
             lazy_values_.push_back(func(*begin++));
 
-        boost::shared_ptr<detail::wait_some<result_type> > f =
-            boost::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type> > f =
+            std::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
 
         (*f.get())();
@@ -511,8 +510,8 @@ namespace hpx { namespace lcos
             return;
         }
 
-        boost::shared_ptr<detail::wait_some<result_type> > f =
-            boost::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type> > f =
+            std::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
 
         return (*f.get())();
@@ -541,8 +540,8 @@ namespace hpx { namespace lcos
             return;
         }
 
-        boost::shared_ptr<detail::wait_some<result_type> > f =
-            boost::make_shared<detail::wait_some<result_type> >(
+        std::shared_ptr<detail::wait_some<result_type> > f =
+            std::make_shared<detail::wait_some<result_type> >(
                 std::move(lazy_values_), n);
 
         return (*f.get())();

@@ -10,8 +10,8 @@
 #include <hpx/util/bind.hpp>
 
 #include <boost/asio/basic_deadline_timer.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
+
+#include <memory>
 
 namespace hpx { namespace threads { namespace executors { namespace detail
 {
@@ -72,8 +72,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         ++task_count_;
 
-        boost::shared_ptr<thread_wrapper_helper> wfp(
-            boost::make_shared<thread_wrapper_helper>(
+        std::shared_ptr<thread_wrapper_helper> wfp(
+            std::make_shared<thread_wrapper_helper>(
                 this, std::move(f)));
 
         pool_->get_io_service().post(
@@ -82,8 +82,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
 
     void service_executor::add_no_count(closure_type && f)
     {
-        boost::shared_ptr<thread_wrapper_helper> wfp(
-            boost::make_shared<thread_wrapper_helper>(
+        std::shared_ptr<thread_wrapper_helper> wfp(
+            std::make_shared<thread_wrapper_helper>(
                 this, std::move(f)));
 
         pool_->get_io_service().post(
@@ -129,8 +129,8 @@ namespace hpx { namespace threads { namespace executors { namespace detail
     {
         ++task_count_;
 
-        boost::shared_ptr<delayed_add_helper> wfp(
-            boost::make_shared<delayed_add_helper>(
+        std::shared_ptr<delayed_add_helper> wfp(
+            std::make_shared<delayed_add_helper>(
                 this, std::move(f), pool_->get_io_service(), abs_time));
 
         wfp->timer_.async_wait(

@@ -29,7 +29,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
         typedef
             sender_connection
             connection_type;
-        typedef boost::shared_ptr<connection_type> connection_ptr;
+        typedef std::shared_ptr<connection_type> connection_ptr;
         typedef std::deque<connection_ptr> connection_list;
 
         typedef hpx::lcos::local::spinlock mutex_type;
@@ -48,7 +48,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace mpi
             performance_counters::parcels::gatherer & parcels_sent)
         {
             return
-                boost::make_shared<connection_type>(
+                std::make_shared<connection_type>(
                     this, dest, parcels_sent);
         }
 

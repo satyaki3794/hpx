@@ -27,6 +27,7 @@
 #include <boost/program_options.hpp>
 
 #include <iostream>
+#include <memory>
 #include <vector>
 #include <string>
 
@@ -1046,7 +1047,7 @@ namespace hpx { namespace util
     {
         util::manage_config cfgmap(ini_config_);
 
-        std::vector<boost::shared_ptr<plugins::plugin_registry_base> >
+        std::vector<std::shared_ptr<plugins::plugin_registry_base> >
             plugin_registries = rtcfg_.load_modules();
 
         // insert the pre-configured ini settings after loading modules
@@ -1099,7 +1100,7 @@ namespace hpx { namespace util
         // will be considered now.
 
         parcelset::parcelhandler::init(&argc, &argv, *this);
-        for (boost::shared_ptr<plugins::plugin_registry_base>& reg : plugin_registries)
+        for (std::shared_ptr<plugins::plugin_registry_base>& reg : plugin_registries)
         {
             reg->init(&argc, &argv, *this);
         }

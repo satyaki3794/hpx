@@ -15,12 +15,11 @@
 
 #include <boost/thread/locks.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/enable_shared_from_this.hpp>
 
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <memory>
 
 #if defined(HPX_MSVC)
 #pragma warning(push)
@@ -36,7 +35,7 @@ namespace hpx { namespace util { namespace detail
 {
     ///////////////////////////////////////////////////////////////////////////
     class HPX_EXPORT interval_timer
-      : public boost::enable_shared_from_this<interval_timer>
+      : public std::enable_shared_from_this<interval_timer>
     {
     private:
         friend class util::interval_timer;
@@ -153,7 +152,7 @@ namespace hpx { namespace util
         void speed_up(util::steady_duration const& min_interval);
 
     private:
-        boost::shared_ptr<detail::interval_timer> timer_;
+        std::shared_ptr<detail::interval_timer> timer_;
     };
 }}
 

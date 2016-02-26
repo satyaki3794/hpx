@@ -19,12 +19,12 @@
 
 #include <boost/asio/basic_io_object.hpp>
 #include <boost/bind.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/scope_exit.hpp>
 #include <boost/atomic.hpp>
+
+#include <memory>
 
 #include <netdb.h>
 #include <rdma/rdma_cma.h>
@@ -171,11 +171,11 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         }
 
         template <typename Parcelport>
-        boost::shared_ptr<receiver> accept(
+        std::shared_ptr<receiver> accept(
             Parcelport & parcelport, util::memory_chunk_pool & pool,
             boost::system::error_code &ec)
         {
-            boost::shared_ptr<receiver> rcv;
+            std::shared_ptr<receiver> rcv;
             rdma_cm_event event;
             if(!get_next_event(event_channel_, event, this, ec))
             {
@@ -242,7 +242,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace ibverbs
         rdma_cm_id *listener_;
 
         typedef
-            std::list<std::pair<rdma_cm_event, boost::shared_ptr<receiver> > >
+            std::list<std::pair<rdma_cm_event, std::shared_ptr<receiver> > >
             pending_recv_list_type;
 
         pending_recv_list_type pending_recv_list;

@@ -39,7 +39,6 @@
 #include <new>
 #include <memory>
 
-#include <boost/shared_ptr.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/format.hpp>
 #include <boost/assign/std/vector.hpp>
@@ -274,7 +273,7 @@ namespace hpx { namespace detail
     }
 
     ///////////////////////////////////////////////////////////////////////////
-    void start_counters(boost::shared_ptr<util::query_counters> const& qc)
+    void start_counters(std::shared_ptr<util::query_counters> const& qc)
     {
         try {
             HPX_ASSERT(qc);
@@ -399,8 +398,8 @@ namespace hpx
 
                 // schedule the query function at startup, which will schedule
                 // itself to run after the given interval
-                boost::shared_ptr<util::query_counters> qc =
-                    boost::make_shared<util::query_counters>(
+                std::shared_ptr<util::query_counters> qc =
+                    std::make_shared<util::query_counters>(
                         boost::ref(counters), interval, destination, counter_format,
                         counter_shortnames, csv_header);
 

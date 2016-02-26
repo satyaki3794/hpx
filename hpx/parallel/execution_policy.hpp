@@ -20,8 +20,6 @@
 #include <hpx/parallel/executors.hpp>
 #include <hpx/parallel/execution_policy_fwd.hpp>
 
-#include <boost/shared_ptr.hpp>
-#include <boost/make_shared.hpp>
 #include <boost/mpl/bool.hpp>
 #include <boost/utility/enable_if.hpp>
 #include <boost/type_traits/is_same.hpp>
@@ -1557,7 +1555,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
     class execution_policy
     {
     private:
-        boost::shared_ptr<detail::execution_policy_base> inner_;
+        std::shared_ptr<detail::execution_policy_base> inner_;
 
     public:
         /// Effects: Constructs an execution_policy object with a copy of
@@ -1572,7 +1570,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
                         !is_rebound_execution_policy<ExPolicy>::value,
                     ExPolicy
                 >::type* = 0)
-          : inner_(boost::make_shared<
+          : inner_(std::make_shared<
                     detail::execution_policy_shim<ExPolicy>
                 >(policy))
         {}
@@ -1628,7 +1626,7 @@ namespace hpx { namespace parallel { HPX_INLINE_NAMESPACE(v1)
         {
             if (this != &policy)
             {
-                inner_ = boost::make_shared<
+                inner_ = std::make_shared<
                         detail::execution_policy_shim<ExPolicy>
                     >(policy);
             }

@@ -18,6 +18,7 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 
+#include <memory>
 #include <stdexcept>
 #include <string>
 #include <utility>
@@ -54,7 +55,7 @@ namespace hpx { namespace util { namespace plugin {
                 }
 
                 abstract_factory<BasePlugin> *w = *xw;
-                return make_pair(w, boost::shared_ptr<PointedType>(f, d));
+                return make_pair(w, std::shared_ptr<PointedType>(f, d));
             }
             else {
                 std::ostringstream str;

@@ -30,11 +30,10 @@
 #include <boost/bind.hpp>
 #include <boost/bind/protect.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/tuple/tuple.hpp>
 
+#include <memory>
 #include <vector>
 
 namespace hpx { namespace parcelset { namespace policies { namespace tcp
@@ -220,7 +219,7 @@ namespace hpx { namespace parcelset { namespace policies { namespace tcp
             void(
                 boost::system::error_code const&
               , parcelset::locality const&
-              , boost::shared_ptr<sender>
+              , std::shared_ptr<sender>
             )
         > postprocess_handler_;
     };

@@ -17,6 +17,8 @@
 #include <hpx/components/component_storage/export_definitions.hpp>
 #include <hpx/components/component_storage/server/component_storage.hpp>
 
+#include <memory>
+
 namespace hpx { namespace components { namespace server
 {
     ///////////////////////////////////////////////////////////////////////////
@@ -58,7 +60,7 @@ namespace hpx { namespace components { namespace server
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here_id(
             naming::id_type const& target_locality,
-            boost::shared_ptr<Component> const& ptr,
+            std::shared_ptr<Component> const& ptr,
             naming::id_type const& to_resurrect)
         {
             // and resurrect it on the specified locality
@@ -73,7 +75,7 @@ namespace hpx { namespace components { namespace server
         template <typename Component>
         future<naming::id_type> migrate_from_storage_here_address(
             naming::address const& addr,
-            boost::shared_ptr<Component> const& ptr,
+            std::shared_ptr<Component> const& ptr,
             naming::id_type const& to_resurrect)
         {
             naming::id_type id(addr.locality_, id_type::unmanaged);
@@ -89,7 +91,7 @@ namespace hpx { namespace components { namespace server
             naming::id_type const& target_locality)
         {
             // recreate the object
-            boost::shared_ptr<Component> ptr;
+            std::shared_ptr<Component> ptr;
 
             {
                 std::vector<char> data = f.get();

@@ -569,7 +569,7 @@ namespace hpx
 
     ///////////////////////////////////////////////////////////////////////////
     void runtime::register_query_counters(
-        boost::shared_ptr<util::query_counters> const& active_counters)
+        std::shared_ptr<util::query_counters> const& active_counters)
     {
         active_counters_ = active_counters;
     }
@@ -820,7 +820,7 @@ namespace hpx
             this->get_thread_manager().init(affinity_init_));
     }
 
-    boost::shared_ptr<util::one_size_heap_list_base> runtime::get_promise_heap(
+    std::shared_ptr<util::one_size_heap_list_base> runtime::get_promise_heap(
         components::component_type type)
     {
         return runtime_support_->get_promise_heap(type);
@@ -1266,7 +1266,7 @@ namespace hpx { namespace threads
 
 namespace hpx { namespace components { namespace detail
 {
-    boost::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
+    std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
         components::component_type type)
     {
         return get_runtime().get_promise_heap(type);
