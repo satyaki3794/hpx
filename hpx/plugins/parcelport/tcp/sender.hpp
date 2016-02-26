@@ -30,7 +30,6 @@
 #include <boost/bind.hpp>
 #include <boost/bind/protect.hpp>
 #include <boost/cstdint.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/tuple/tuple.hpp>
 
 #include <memory>

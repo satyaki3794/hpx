@@ -33,7 +33,6 @@
 #include <boost/detail/atomic_count.hpp>
 
 #include <boost/context/all.hpp>
-#include <boost/noncopyable.hpp>
 
 #include <cstddef>
 #include <cstdlib>
@@ -165,8 +164,9 @@ namespace hpx { namespace util { namespace coroutines
         }
 
         class fcontext_context_impl
-          : private boost::noncopyable
         {
+            HPX_NON_COPYABLE(fcontext_context_impl);
+
         public:
             typedef fcontext_context_impl context_impl_base;
 

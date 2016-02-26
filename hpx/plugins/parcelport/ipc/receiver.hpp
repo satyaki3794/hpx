@@ -21,7 +21,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/asio/placeholders.hpp>
 #include <boost/tuple/tuple.hpp>
 

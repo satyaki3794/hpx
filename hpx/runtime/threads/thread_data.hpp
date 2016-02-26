@@ -27,7 +27,6 @@
 
 #include <boost/atomic.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/lockfree/stack.hpp>
 
 #include <stack>

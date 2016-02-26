@@ -30,7 +30,6 @@
 #include <boost/asio/write.hpp>
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/tuple/tuple.hpp>
 #include <boost/thread/locks.hpp>
 

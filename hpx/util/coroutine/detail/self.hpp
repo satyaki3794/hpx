@@ -34,14 +34,15 @@
 #include <hpx/util/coroutine/detail/coroutine_accessor.hpp>
 #include <hpx/util/function.hpp>
 
-#include <boost/noncopyable.hpp>
 #include <utility>
 
 namespace hpx { namespace util { namespace coroutines { namespace detail
 {
   template <typename Coroutine>
-  class coroutine_self : boost::noncopyable
+  class coroutine_self
   {
+    HPX_NON_COPYABLE(coroutine_self);
+
     // store the current this and write it to the TSS on exit
     struct reset_self_on_exit
     {

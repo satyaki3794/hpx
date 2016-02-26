@@ -47,6 +47,9 @@ namespace hpx { namespace lcos { namespace local
     struct spinlock
     {
     private:
+        HPX_NON_COPYABLE(spinlock);
+
+    private:
 #if defined(__ANDROID__) && defined(ANDROID)
         int v_;
 #else
@@ -127,8 +130,6 @@ namespace hpx { namespace lcos { namespace local
         {
             HPX_ITT_SYNC_CREATE(this, desc, "");
         }
-
-        HPX_NON_COPYABLE(spinlock)
 
         ~spinlock()
         {

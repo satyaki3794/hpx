@@ -23,7 +23,6 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/atomic.hpp>
 #include <boost/bind.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/thread/locks.hpp>
 
 #include <memory>

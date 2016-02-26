@@ -16,7 +16,6 @@
 #include <hpx/lcos/local/recursive_mutex.hpp>
 
 #include <boost/swap.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/atomic.hpp>
 #include <boost/thread/locks.hpp>
