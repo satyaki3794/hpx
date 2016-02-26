@@ -408,11 +408,11 @@ namespace hpx
                 {
                     // schedule to run at shutdown
                     rt.add_pre_shutdown_function(
-                        boost::bind(&util::query_counters::evaluate, qc));
+                        util::bind(&util::query_counters::evaluate, qc));
                 }
 
                 // schedule to start all counters
-                rt.add_startup_function(boost::bind(&start_counters, qc));
+                rt.add_startup_function(util::bind(&start_counters, qc));
 
                 // register the query_counters object with the runtime system
                 rt.register_query_counters(qc);
@@ -669,7 +669,7 @@ namespace hpx
 
             // Run this runtime instance using the given function f.
             if (!f.empty())
-                return rt.run(boost::bind(f, vm));
+                return rt.run(util::bind(f, vm));
 
             // Run this runtime instance without an hpx_main
             return rt.run();
@@ -686,7 +686,7 @@ namespace hpx
 
             if (!f.empty()) {
                 // Run this runtime instance using the given function f.
-                return rt.start(boost::bind(f, vm));
+                return rt.start(util::bind(f, vm));
             }
 
             // Run this runtime instance without an hpx_main

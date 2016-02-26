@@ -7,6 +7,7 @@
 
 #if defined(HPX_HAVE_PARCEL_COALESCING)
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 
 #include <hpx/plugins/message_handler_factory.hpp>
@@ -71,8 +72,8 @@ namespace hpx { namespace plugins { namespace parcel
             char const* action_name, parcelset::parcelport* pp, std::size_t num,
             std::size_t interval)
       : pp_(pp), buffer_(detail::get_num_messages(num)),
-        timer_(boost::bind(&coalescing_message_handler::timer_flush, this_()),
-            boost::bind(&coalescing_message_handler::flush, this_(), true),
+        timer_(util::bind(&coalescing_message_handler::timer_flush, this_()),
+            util::bind(&coalescing_message_handler::flush, this_(), true),
             detail::get_interval(interval), std::string(action_name) + "_timer",
             true),
         stopped_(false)
@@ -106,7 +107,7 @@ namespace hpx { namespace plugins { namespace parcel
             break;
 
         case detail::message_buffer::buffer_now_full:
-            flush(l, false);
+            flush_locked(l, false);
             break;
 
         default:
@@ -122,7 +123,7 @@ namespace hpx { namespace plugins { namespace parcel
         // adjust timer if needed
         boost::unique_lock<mutex_type> l(mtx_);
         if (!buffer_.empty())
-            flush(l, false);
+            flush_locked(l, false);
 
         // do not restart timer for now, will be restarted on next parcel
         return false;
@@ -131,10 +132,10 @@ namespace hpx { namespace plugins { namespace parcel
     bool coalescing_message_handler::flush(bool stop_buffering)
     {
         boost::unique_lock<mutex_type> l(mtx_);
-        return flush(l, stop_buffering);
+        return flush_locked(l, stop_buffering);
     }
 
-    bool coalescing_message_handler::flush(
+    bool coalescing_message_handler::flush_locked(
         boost::unique_lock<mutex_type>& l,
         bool stop_buffering)
     {

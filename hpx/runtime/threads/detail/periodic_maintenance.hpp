@@ -59,7 +59,7 @@ namespace hpx { namespace threads { namespace detail
                 boost::mpl::true_) =
                 &periodic_maintenance_handler<SchedulingPolicy>;
 
-            t.async_wait(boost::bind(handler, boost::ref(scheduler),
+            t.async_wait(util::bind(handler, boost::ref(scheduler),
                 boost::ref(global_state), boost::mpl::true_()));
         }
     }

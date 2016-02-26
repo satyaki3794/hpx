@@ -17,6 +17,7 @@
 
 #include <hpx/runtime/parcelset/locality.hpp>
 #include <hpx/runtime/parcelset/parcelport.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/high_resolution_timer.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/lcos/local/spinlock.hpp>
@@ -24,8 +25,6 @@
 #include <hpx/plugins/parcelport_factory_base.hpp>
 
 #include <hpx/config/warnings_prefix.hpp>
-
-#include <boost/bind.hpp>
 
 #include <map>
 #include <memory>

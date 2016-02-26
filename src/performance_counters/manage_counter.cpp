@@ -55,7 +55,7 @@ namespace hpx { namespace performance_counters
         p->install(id, info, ec);
 
         // Register the shutdown function which will clean up this counter.
-        get_runtime().add_shutdown_function(boost::bind(&counter_shutdown, p));
+        get_runtime().add_shutdown_function(util::bind(&counter_shutdown, p));
     }
 }}
 

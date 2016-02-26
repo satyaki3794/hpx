@@ -30,8 +30,8 @@ namespace hpx { namespace util
             std::vector<std::string> const& shortnames, bool csv_header)
       : names_(names), destination_(dest), format_(form),
             counter_shortnames_(shortnames), csv_header_(csv_header),
-        timer_(boost::bind(&query_counters::evaluate, this_()),
-            boost::bind(&query_counters::terminate, this_()),
+        timer_(util::bind(&query_counters::evaluate, this_()),
+            util::bind(&query_counters::terminate, this_()),
             interval*1000, "query_counters", true)
     {
         // add counter prefix, if necessary

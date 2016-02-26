@@ -22,13 +22,13 @@
 #endif
 
 #include <boost/version.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/logging/detail/fwd.hpp>
 #include <hpx/util/logging/detail/forward_constructor.hpp>
 #include <memory>
 #include <vector>
 #include <boost/thread/thread.hpp>
 #include <boost/thread/xtime.hpp>
-#include <boost/bind.hpp>
 #include <hpx/util/logging/detail/manipulator.hpp> // hpx::util::logging::manipulator
 
 namespace hpx { namespace util { namespace logging { namespace writer {
@@ -172,7 +172,7 @@ struct on_dedicated_thread
         scoped_lock lk( non_const_context_base::context().cs);
         if ( !non_const_context_base::context().writer)
             non_const_context_base::context().writer = thread_ptr(
-                new boost::thread( boost::bind(&self_type::do_write,this) ));
+                new boost::thread( util::bind(&self_type::do_write,this) ));
 
         non_const_context_base::context().msgs.push_back(new_msg);
     }

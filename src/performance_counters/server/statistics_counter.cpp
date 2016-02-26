@@ -246,8 +246,8 @@ namespace hpx { namespace performance_counters { namespace server
             counter_info const& info, std::string const& base_counter_name,
             boost::uint64_t parameter1, boost::uint64_t parameter2)
       : base_type_holder(info),
-        timer_(boost::bind(&statistics_counter::evaluate, this_()),
-            boost::bind(&statistics_counter::on_terminate, this_()),
+        timer_(util::bind(&statistics_counter::evaluate, this_()),
+            util::bind(&statistics_counter::on_terminate, this_()),
             1000 * parameter1, info.fullname_, true),
         base_counter_name_(ensure_counter_prefix(base_counter_name)),
         value_(new detail::counter_type_from_statistic<Statistic>(parameter2)),

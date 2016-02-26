@@ -8,20 +8,25 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/type_traits/integral_constant.hpp>
+#include <boost/is_placeholder.hpp>
 
 #ifdef HPX_HAVE_CXX11_STD_IS_PLACEHOLDER
 #include <functional>
 #endif
+#include <type_traits>
 
 namespace hpx { namespace traits
 {
     template <typename T>
     struct is_placeholder
 #ifdef HPX_HAVE_CXX11_STD_IS_PLACEHOLDER
-      : std::is_placeholder<T>
+      : std::conditional<
+            std::is_placeholder<T>::value != 0,
+            std::is_placeholder<T>,
+            boost::is_placeholder<T>
+        >::type
 #else
-      : boost::integral_constant<int, 0>
+      : boost::is_placeholder<T>
 #endif
     {};
 }}

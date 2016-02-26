@@ -76,7 +76,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        boost::bind(&accumulator_stats::print_stats, This()));
+                        util::bind(&accumulator_stats::print_stats, This()));
                 }
                 timer_.restart();
             }
@@ -86,7 +86,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        boost::bind(&accumulator_stats::print_stats, This()));
+                        util::bind(&accumulator_stats::print_stats, This()));
                 }
                 return timer_.elapsed();
             }
@@ -143,7 +143,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        boost::bind(&accumulator_stats::print_stats, This()));
+                        util::bind(&accumulator_stats::print_stats, This()));
                 }
                 timer_.restart();
             }
@@ -153,7 +153,7 @@ namespace hpx { namespace util
                 if (!registered_on_exit_)
                 {
                     registered_on_exit_ = hpx::register_on_exit(
-                        boost::bind(&accumulator_stats::print_stats, This()));
+                        util::bind(&accumulator_stats::print_stats, This()));
                 }
                 return timer_.elapsed();
             }

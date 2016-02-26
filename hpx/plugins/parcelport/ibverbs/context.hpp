@@ -21,7 +21,6 @@
 #include <boost/asio/basic_io_object.hpp>
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/ip/tcp.hpp>
-#include <boost/bind.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/scope_exit.hpp>

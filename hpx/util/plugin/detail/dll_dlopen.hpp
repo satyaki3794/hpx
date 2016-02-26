@@ -11,7 +11,6 @@
 #include <stdexcept>
 #include <iostream>
 
-#include <boost/bind.hpp>
 #include <boost/type_traits/remove_pointer.hpp>
 #include <boost/type_traits/is_pointer.hpp>
 #include <boost/thread/mutex.hpp>
@@ -23,6 +22,7 @@
 #include <utility>
 
 #include <hpx/exception.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/plugin/config.hpp>
 
 #if !defined(__ANDROID__) && !defined(ANDROID) && !defined(__APPLE__)

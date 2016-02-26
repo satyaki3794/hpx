@@ -7,6 +7,7 @@
 #define HPX_UTIL_STATIC_JUN_12_2008_0934AM
 
 #include <hpx/config.hpp>
+#include <hpx/util/bind.hpp>
 
 #include <boost/call_traits.hpp>
 #include <boost/aligned_storage.hpp>
@@ -21,7 +22,6 @@
     !(HPX_INTEL_VERSION > 1200 && !defined(HPX_WINDOWS)) && \
     (_MSC_FULL_VER < 180021114)         // NovCTP_2013
 #include <boost/thread/once.hpp>
-#include <boost/bind.hpp>
 
 #include <memory>   // for placement new
 #endif

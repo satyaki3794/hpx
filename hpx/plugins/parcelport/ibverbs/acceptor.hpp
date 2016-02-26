@@ -18,7 +18,6 @@
 #include <hpx/util/io_service_pool.hpp>
 
 #include <boost/asio/basic_io_object.hpp>
-#include <boost/bind.hpp>
 #include <boost/system/system_error.hpp>
 #include <boost/thread/thread_time.hpp>
 #include <boost/scope_exit.hpp>

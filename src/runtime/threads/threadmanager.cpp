@@ -18,6 +18,7 @@
 #include <hpx/performance_counters/counter_creators.hpp>
 #include <hpx/runtime/actions/continuation.hpp>
 #include <hpx/util/assert.hpp>
+#include <hpx/util/bind.hpp>
 #include <hpx/util/unlock_guard.hpp>
 #include <hpx/util/logging.hpp>
 #include <hpx/util/block_profiler.hpp>
@@ -25,7 +26,6 @@
 #include <hpx/util/hardware/timestamp.hpp>
 #include <hpx/util/runtime_configuration.hpp>
 
-#include <boost/bind.hpp>
 #include <boost/cstdint.hpp>
 #include <boost/format.hpp>
 #include <boost/thread/locks.hpp>
@@ -812,9 +812,12 @@ namespace hpx { namespace threads
     void threadmanager_impl<SchedulingPolicy>::
         register_counter_types()
     {
+        using util::placeholders::_1;
+        using util::placeholders::_2;
+
         typedef threadmanager_impl ti;
         performance_counters::create_counter_func counts_creator(
-            boost::bind(&ti::thread_counts_counter_creator, this, _1, _2));
+            util::bind(&ti::thread_counts_counter_creator, this, _1, _2));
 
         performance_counters::generic_counter_type_data counter_types[] =
         {
@@ -822,7 +825,7 @@ namespace hpx { namespace threads
             { "/threadqueue/length", performance_counters::counter_raw,
               "returns the current queue length for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&ti::queue_length_counter_creator, this, _1, _2),
+              util::bind(&ti::queue_length_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
               ""
             },
@@ -832,7 +835,7 @@ namespace hpx { namespace threads
               "returns the average wait time of \
                  pending threads for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&ti::thread_wait_time_counter_creator, this, _1, _2),
+              util::bind(&ti::thread_wait_time_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
             },
@@ -841,7 +844,7 @@ namespace hpx { namespace threads
               "returns the average wait time of staged threads (task descriptions) "
               "for the referenced queue",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&ti::task_wait_time_counter_creator, this, _1, _2),
+              util::bind(&ti::task_wait_time_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
               "ns"
             },
@@ -851,7 +854,7 @@ namespace hpx { namespace threads
             { "/threads/idle-rate", performance_counters::counter_raw,
               "returns the idle rate for the referenced object",
               HPX_PERFORMANCE_COUNTER_V1,
-              boost::bind(&ti::idle_rate_counter_creator, this, _1, _2),
+              util::bind(&ti::idle_rate_counter_creator, this, _1, _2),
               &performance_counters::locality_thread_counter_discoverer,
               "0.01%"
             },

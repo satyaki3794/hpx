@@ -7,16 +7,15 @@
 
 #include <hpx/config.hpp>
 
-#include <boost/ref.hpp>
-#include <boost/bind.hpp>
-
 #include <hpx/runtime.hpp>
 #include <hpx/runtime/threads/thread_helpers.hpp>
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/components/iostreams/server/output_stream.hpp>
-
+#include <hpx/util/bind.hpp>
 #include <hpx/util/io_service_pool.hpp>
+
+#include <boost/ref.hpp>
 
 #include <iostream>
 
@@ -58,7 +57,7 @@ namespace hpx { namespace iostreams { namespace server
     { // {{{
         // Perform the IO in another OS thread.
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            boost::bind(&output_stream::call_write_async, this, locality_id,
+            util::bind(&output_stream::call_write_async, this, locality_id,
                 count, in));
     } // }}}
 
@@ -78,7 +77,7 @@ namespace hpx { namespace iostreams { namespace server
     { // {{{
         // Perform the IO in another OS thread.
         hpx::get_thread_pool("io_pool")->get_io_service().post(
-            boost::bind(&output_stream::call_write_sync, this, locality_id,
+            util::bind(&output_stream::call_write_sync, this, locality_id,
                 count, in, threads::get_self_id()));
 
         // Sleep until the worker thread wakes us up.

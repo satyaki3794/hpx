@@ -87,7 +87,7 @@ namespace hpx { namespace lcos { namespace local
         static void value_constructor(U const* pv)
         {
             value_construct(*pv);
-            util::reinit_register(boost::bind(
+            util::reinit_register(util::bind(
                 &reinitializable_static::value_construct<U>, *pv), &destruct);
         }
 
@@ -107,7 +107,7 @@ namespace hpx { namespace lcos { namespace local
         {
             // do not rely on ADL to find the proper call_once
             lcos::local::call_once(constructed_,
-                boost::bind(&reinitializable_static::value_constructor<U>,
+                util::bind(&reinitializable_static::value_constructor<U>,
                     boost::addressof(val)));
         }
 
