@@ -15,7 +15,6 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/util/security/root_certificate_authority.hpp>
 #include <hpx/util/security/subordinate_certificate_authority.hpp>
-#include <boost/make_shared.hpp>
 
 #include <iostream>
 #include <vector>

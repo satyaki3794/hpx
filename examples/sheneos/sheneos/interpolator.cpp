@@ -13,8 +13,9 @@
 #include <hpx/lcos/local/packaged_task.hpp>
 #include <hpx/util/assert.hpp>
 
-#include <boost/make_shared.hpp>
 #include <boost/move/move.hpp>
+
+#include <memory>
 
 #include "read_values.hpp"
 #include "partition3d.hpp"
@@ -330,7 +331,7 @@ namespace sheneos
 
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
-        on_completed_bulk_one(boost::shared_ptr<partitions_type> parts,
+        on_completed_bulk_one(std::shared_ptr<partitions_type> parts,
                 context_data const& data,
                 std::vector<double>& overall_result)
           : data_(data), overall_result_(overall_result), partitions_(parts)
@@ -354,7 +355,7 @@ namespace sheneos
 
         boost::reference_wrapper<context_data const> data_;
         boost::reference_wrapper<std::vector<double> > overall_result_;
-        boost::shared_ptr<partitions_type> partitions_;
+        std::shared_ptr<partitions_type> partitions_;
     };
 
     struct bulk_one_context
@@ -362,7 +363,7 @@ namespace sheneos
         typedef std::vector<double> result_type;
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
-        bulk_one_context(boost::shared_ptr<partitions_type> parts, std::size_t s,
+        bulk_one_context(std::shared_ptr<partitions_type> parts, std::size_t s,
                 boost::uint32_t eos)
           : partitions(parts), size(s), eosvalue(eos)
         {}
@@ -402,7 +403,7 @@ namespace sheneos
             return overall_result;
         }
 
-        boost::shared_ptr<partitions_type> partitions;
+        std::shared_ptr<partitions_type> partitions;
         std::size_t size;
         boost::uint32_t eosvalue;
     };
@@ -416,8 +417,8 @@ namespace sheneos
         namespace lcos = hpx::lcos;
 
         typedef std::map<naming::id_type, context_data> partitions_type;
-        boost::shared_ptr<partitions_type> partitions(
-            boost::make_shared<partitions_type>());
+        std::shared_ptr<partitions_type> partitions(
+            std::make_shared<partitions_type>());
 
         partitions_type& parts = *partitions;
 
@@ -446,7 +447,7 @@ namespace sheneos
 
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
-        on_completed_bulk(boost::shared_ptr<partitions_type> parts,
+        on_completed_bulk(std::shared_ptr<partitions_type> parts,
                 context_data const& data,
                 std::vector<std::vector<double> >& overall_results)
           : data_(data), overall_results_(overall_results), partitions_(parts)
@@ -471,7 +472,7 @@ namespace sheneos
 
         boost::reference_wrapper<context_data const> data_;
         boost::reference_wrapper<std::vector<std::vector<double> > > overall_results_;
-        boost::shared_ptr<partitions_type> partitions_;
+        std::shared_ptr<partitions_type> partitions_;
     };
 
     ///////////////////////////////////////////////////////////////////////////
@@ -480,7 +481,7 @@ namespace sheneos
         typedef std::vector<std::vector<double> > result_type;
         typedef std::map<hpx::naming::id_type, context_data> partitions_type;
 
-        bulk_context(boost::shared_ptr<partitions_type> parts, std::size_t s,
+        bulk_context(std::shared_ptr<partitions_type> parts, std::size_t s,
                 boost::uint32_t eos)
           : partitions(parts), size(s), eosvalues(eos)
         {}
@@ -520,7 +521,7 @@ namespace sheneos
             return overall_results;
         }
 
-        boost::shared_ptr<partitions_type> partitions;
+        std::shared_ptr<partitions_type> partitions;
         std::size_t size;
         boost::uint32_t eosvalues;
     };
@@ -533,8 +534,8 @@ namespace sheneos
         namespace lcos = hpx::lcos;
 
         typedef std::map<naming::id_type, context_data> partitions_type;
-        boost::shared_ptr<partitions_type> partitions(
-            boost::make_shared<partitions_type>());
+        std::shared_ptr<partitions_type> partitions(
+            std::make_shared<partitions_type>());
 
         partitions_type& parts = *partitions;
 

@@ -13,11 +13,13 @@
 
 #include <hpx/util/lightweight_test.hpp>
 
+#include <memory>
+
 void test_shared()
 {
-    boost::shared_ptr<int> ip(new int(7));
-    boost::shared_ptr<int> op1;
-    boost::shared_ptr<int> op2;
+    std::shared_ptr<int> ip(new int(7));
+    std::shared_ptr<int> op1;
+    std::shared_ptr<int> op2;
     {
         std::vector<char> buffer;
         hpx::serialization::output_archive oarchive(buffer);

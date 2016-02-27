@@ -12,6 +12,7 @@
 #include <boost/range/irange.hpp>
 
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #define COL_SHIFT 1000.00           // Constant to shift column index
@@ -282,9 +283,9 @@ int hpx_main(boost::program_options::variables_map& vm)
         for_each(par, boost::begin(range), boost::end(range),
             [&](boost::uint64_t b)
             {
-                boost::shared_ptr<block_component> A_ptr =
+                std::shared_ptr<block_component> A_ptr =
                     hpx::get_ptr<block_component>(A[b].get_gid()).get();
-                boost::shared_ptr<block_component> B_ptr =
+                std::shared_ptr<block_component> B_ptr =
                     hpx::get_ptr<block_component>(B[b].get_gid()).get();
 
                 for(boost::uint64_t i = 0; i != order; ++i)

@@ -15,6 +15,7 @@
 #include <boost/format.hpp>
 #include <boost/range/functions.hpp>
 
+#include <memory>
 #include <stdexcept>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -61,8 +62,8 @@ void measure_parallel_foreach(std::size_t size)
 
 hpx::future<void> measure_task_foreach(std::size_t size)
 {
-    boost::shared_ptr<std::vector<std::size_t> > data_representation(
-        boost::make_shared<std::vector<std::size_t> >(size));
+    std::shared_ptr<std::vector<std::size_t> > data_representation(
+        std::make_shared<std::vector<std::size_t> >(size));
     std::iota(boost::begin(*data_representation),
         boost::end(*data_representation),
         std::rand());

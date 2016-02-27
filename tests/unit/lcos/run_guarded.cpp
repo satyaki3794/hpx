@@ -7,13 +7,14 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/hpx_init.hpp>
 #include <iostream>
+#include <memory>
 #include <stdlib.h>
 
 typedef boost::atomic<int> int_atomic;
 int_atomic i1(0), i2(0);
 hpx::lcos::local::guard_set guards;
-boost::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());
-boost::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
+std::shared_ptr<hpx::lcos::local::guard> l1(new hpx::lcos::local::guard());
+std::shared_ptr<hpx::lcos::local::guard> l2(new hpx::lcos::local::guard());
 
 void incr1() {
     // implicitly lock l1

@@ -10,8 +10,6 @@
 
 #include "stencil_iterator.hpp"
 
-#include <boost/make_shared.hpp>
-
 namespace jacobi
 {
     namespace server

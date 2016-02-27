@@ -13,8 +13,6 @@
 #include <iostream>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 static std::string itoa(int i)
 {
     std::stringstream buf;

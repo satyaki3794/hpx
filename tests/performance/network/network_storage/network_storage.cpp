@@ -7,7 +7,6 @@
 #include <hpx/hpx.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/atomic.hpp>
 #include <boost/array.hpp>
 #include <boost/random.hpp>

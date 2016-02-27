@@ -9,8 +9,6 @@
 #include <hpx/util/lightweight_test.hpp>
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 
-#include <boost/shared_ptr.hpp>
-
 ///////////////////////////////////////////////////////////////////////////////
 typedef hpx::serialization::serialize_buffer<char> buffer_plain_type;
 

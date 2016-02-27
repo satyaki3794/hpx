@@ -11,7 +11,6 @@
 #include <hpx/runtime/serialization/serialize.hpp>
 #include <hpx/runtime/serialization/shared_ptr.hpp>
 #include <hpx/runtime/serialization/vector.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <cassert>
 #include <cstdlib>

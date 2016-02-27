@@ -12,6 +12,7 @@
 #include <hpx/hpx_init.hpp>
 #include <hpx/hpx.hpp>
 
+#include <memory>
 #include <stdexcept>
 
 #include <boost/format.hpp>
@@ -79,7 +80,7 @@ void print_results(
   , double walltime
   , double warmup_estimate
   , std::vector<std::string> const& counter_shortnames
-  , boost::shared_ptr<hpx::util::activate_counters> ac
+  , std::shared_ptr<hpx::util::activate_counters> ac
     )
 {
     std::vector<hpx::performance_counters::counter_value> counter_values;
@@ -423,7 +424,7 @@ int hpx_main(
             }
         }
 
-        boost::shared_ptr<hpx::util::activate_counters> ac;
+        std::shared_ptr<hpx::util::activate_counters> ac;
         if (!counters.empty())
             ac.reset(new hpx::util::activate_counters(counters));
 

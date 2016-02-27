@@ -11,7 +11,6 @@
 #include <hpx/runtime/serialization/serialize_buffer.hpp>
 
 #include <boost/assert.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <benchmarks/network/osu_coll.hpp>
 
