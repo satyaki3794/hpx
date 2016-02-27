@@ -35,14 +35,9 @@ void free(guard_task *task) {
     delete task;
 }
 
-bool sort_guard(std::shared_ptr<guard> const& l1,
-        std::shared_ptr<guard> const& l2) {
-    return boost::get_pointer(l1) < boost::get_pointer(l2);
-}
-
 void guard_set::sort() {
     if(!sorted) {
-        std::sort(guards.begin(),guards.end(),sort_guard);
+        std::sort(guards.begin(), guards.end());
         (*guards.begin())->check();
         sorted = true;
     }
