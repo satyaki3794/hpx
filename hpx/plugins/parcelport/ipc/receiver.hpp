@@ -148,13 +148,6 @@ namespace hpx { namespace parcelset { namespace policies { namespace ipc
         /// Counters and timers for parcels received.
         util::high_resolution_timer timer_;
     };
-
-    // this makes sure we can store our connections in a set
-    inline bool operator<(std::shared_ptr<receiver> const& lhs,
-        std::shared_ptr<receiver> const& rhs)
-    {
-        return lhs.get() < rhs.get();
-    }
 }}}}
 
 #endif
