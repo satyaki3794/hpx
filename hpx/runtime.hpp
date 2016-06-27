@@ -301,13 +301,6 @@ namespace hpx
         virtual notification_policy_type
             get_notification_policy(char const* prefix) = 0;
 
-        /// This function creates anew base_lco_factory (if none is available
-        /// for the given type yet), registers this factory with the
-        /// runtime_support object and asks the factory for it's heap object
-        // which can be used to create new promises of the given type.
-        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-            components::component_type type);
-
         ///////////////////////////////////////////////////////////////////////
         // management API for active performance counters
         void register_query_counters(
@@ -317,7 +310,7 @@ namespace hpx
         void stop_active_counters(error_code& ec = throws);
         void reset_active_counters(error_code& ec = throws);
         void evaluate_active_counters(bool reset = false,
-            char const* description = 0, error_code& ec = throws);
+            char const* description = nullptr, error_code& ec = throws);
 
         // stop periodic evaluation of counters during shutdown
         void stop_evaluating_counters();

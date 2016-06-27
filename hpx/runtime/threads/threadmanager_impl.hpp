@@ -205,9 +205,9 @@ namespace hpx { namespace threads
             pool_.report_error(num_thread, e);
         }
 
-        std::size_t get_worker_thread_num(bool* numa_sensitive = 0)
+        std::size_t get_worker_thread_num(bool* numa_sensitive = nullptr)
         {
-            if (get_self_ptr() == 0)
+            if (get_self_ptr() == nullptr)
                 return std::size_t(-1);
             return pool_.get_worker_thread_num();
         }

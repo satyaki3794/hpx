@@ -26,11 +26,10 @@
 #include <hpx/parallel/util/detail/scoped_executor_parameters.hpp>
 
 #include <boost/exception_ptr.hpp>
-#include <boost/make_shared.hpp>
-#include <boost/shared_ptr.hpp>
 
 #include <algorithm>
 #include <list>
+#include <memory>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,8 +195,8 @@ namespace hpx { namespace parallel { namespace util
                     > tuple_type;
 
                 // inform parameter traits
-                boost::shared_ptr<scoped_executor_parameters>
-                    scoped_param(boost::make_shared<
+                std::shared_ptr<scoped_executor_parameters>
+                    scoped_param(std::make_shared<
                             scoped_executor_parameters
                         >(policy.parameters()));
 

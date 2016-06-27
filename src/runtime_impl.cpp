@@ -57,7 +57,7 @@ namespace hpx {
     void register_pre_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_pre_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_startup_function",
@@ -74,7 +74,7 @@ namespace hpx {
     void register_startup_function(startup_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_startup) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_startup_function",
@@ -91,7 +91,7 @@ namespace hpx {
     void register_pre_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_pre_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_pre_shutdown_function",
@@ -108,7 +108,7 @@ namespace hpx {
     void register_shutdown_function(shutdown_function_type f)
     {
         runtime* rt = get_runtime_ptr();
-        if (NULL != rt) {
+        if (nullptr != rt) {
             if (rt->get_state() > state_shutdown) {
                 HPX_THROW_EXCEPTION(invalid_status,
                     "register_shutdown_function",
@@ -633,7 +633,7 @@ namespace hpx {
         applier_.init_tss();
 
         // set the thread's name, if it's not already set
-        if (NULL == runtime::thread_name_.get())
+        if (nullptr == runtime::thread_name_.get())
         {
             std::string* fullname = new std::string(context);
             if (postfix && *postfix)
@@ -746,7 +746,7 @@ namespace hpx {
     runtime_impl<SchedulingPolicy>::
         get_thread_pool(char const* name)
     {
-        HPX_ASSERT(name != 0);
+        HPX_ASSERT(name != nullptr);
 
         if (0 == std::strncmp(name, "io", 2))
             return &io_pool_;
@@ -757,7 +757,7 @@ namespace hpx {
         if (0 == std::strncmp(name, "main", 4)) //-V112
             return &main_pool_;
 
-        return 0;
+        return nullptr;
     }
 
     /// Register an external OS-thread with HPX
@@ -766,13 +766,13 @@ namespace hpx {
         register_thread(char const* name, std::size_t num, bool service_thread,
             error_code& ec)
     {
-        if (NULL != runtime::thread_name_.get())
+        if (nullptr != runtime::thread_name_.get())
             return false;       // already registered
 
         std::string thread_name(name);
         thread_name += "-thread";
 
-        init_tss_ex(thread_name.c_str(), num, 0, service_thread, ec);
+        init_tss_ex(thread_name.c_str(), num, nullptr, service_thread, ec);
 
         return !ec ? true : false;
     }
@@ -782,7 +782,7 @@ namespace hpx {
     bool runtime_impl<SchedulingPolicy>::
         unregister_thread()
     {
-        if (NULL == runtime::thread_name_.get())
+        if (nullptr == runtime::thread_name_.get())
             return false;       // never registered
 
         deinit_tss();

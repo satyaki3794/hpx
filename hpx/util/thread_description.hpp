@@ -63,7 +63,8 @@ namespace hpx { namespace util
                 !std::is_same<F, thread_description>::value &&
                 !traits::is_action<F>::value
             >::type>
-        explicit thread_description(F const& f, char const* altname = 0) HPX_NOEXCEPT
+        explicit thread_description(F const& f,
+                char const* altname = nullptr) HPX_NOEXCEPT
           : type_(data_type_description)
         {
 #if defined(HPX_HAVE_THREAD_DESCRIPTION_FULL)
@@ -79,7 +80,7 @@ namespace hpx { namespace util
                 traits::is_action<Action>::value
             >::type>
         explicit thread_description(Action,
-                char const* altname = 0) HPX_NOEXCEPT
+                char const* altname = nullptr) HPX_NOEXCEPT
           : type_(data_type_description)
         {
             data_.desc_ = hpx::actions::detail::get_action_name<Action>();
@@ -110,7 +111,7 @@ namespace hpx { namespace util
         bool valid() const HPX_NOEXCEPT
         {
             if (type_ == data_type_description)
-                return 0 != data_.desc_;
+                return nullptr != data_.desc_;
 
             HPX_ASSERT(type_ == data_type_address);
             return 0 != data_.addr_;
@@ -146,7 +147,7 @@ namespace hpx { namespace util
                 !traits::is_action<F>::value
             >::type>
         explicit thread_description(F const& f,
-            char const* altname = 0) HPX_NOEXCEPT
+            char const* altname = nullptr) HPX_NOEXCEPT
         {
         }
 
@@ -155,7 +156,7 @@ namespace hpx { namespace util
                 traits::is_action<Action>::value
             >::type>
         explicit thread_description(Action,
-            char const* altname = 0) HPX_NOEXCEPT
+            char const* altname = nullptr) HPX_NOEXCEPT
         {
         }
 

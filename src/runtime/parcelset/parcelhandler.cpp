@@ -357,7 +357,7 @@ namespace hpx { namespace parcelset
     /// Return the reference to an existing io_service
     util::io_service_pool* parcelhandler::get_thread_pool(char const* name)
     {
-        util::io_service_pool* result = 0;
+        util::io_service_pool* result = nullptr;
         for (pports_type::value_type& pp : pports_)
         {
             result = pp.second->get_thread_pool(name);
@@ -712,9 +712,9 @@ namespace hpx { namespace parcelset
                     HPX_THROWS_IF(ec, internal_server_error,
                         "parcelhandler::get_message_handler",
                         "could not store empty message handler");
-                    return 0;
+                    return nullptr;
                 }
-                return 0;           // no message handler available
+                return nullptr;           // no message handler available
             }
 
             std::pair<message_handler_map::iterator, bool> r =
@@ -725,7 +725,7 @@ namespace hpx { namespace parcelset
                 HPX_THROWS_IF(ec, internal_server_error,
                     "parcelhandler::get_message_handler",
                     "could not store newly created message handler");
-                return 0;
+                return nullptr;
             }
             it = r.first;
         }
@@ -741,7 +741,7 @@ namespace hpx { namespace parcelset
                     "parcelhandler::get_message_handler",
                     "couldn't find an appropriate message handler");
             }
-            return 0;           // no message handler available
+            return nullptr;           // no message handler available
         }
 
         if (&ec != &throws)

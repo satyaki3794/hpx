@@ -299,7 +299,7 @@ namespace detail
         {
             // yields control if needed
             wait(ec);
-            if (ec) return NULL;
+            if (ec) return nullptr;
 
             // No locking is required. Once a future has been made ready, which
             // is a postcondition of wait, either:
@@ -313,7 +313,7 @@ namespace detail
                 HPX_THROWS_IF(ec, no_state,
                     "future_data::get_result",
                     "this future has no valid shared state");
-                return NULL;
+                return nullptr;
             }
 
             // the thread has been re-activated by one of the actions
@@ -332,7 +332,7 @@ namespace detail
                 else {
                     ec = make_error_code(*exception_ptr);
                 }
-                return NULL;
+                return nullptr;
             }
             return static_cast<result_type*>(storage_.address());
         }
@@ -357,11 +357,11 @@ namespace detail
         {
             // We need to run the completion asynchronously if we aren't on a
             // HPX thread
-            if (HPX_UNLIKELY(0 == threads::get_self_ptr()))
+            if (HPX_UNLIKELY(nullptr == threads::get_self_ptr()))
             {
                 HPX_THROW_EXCEPTION(null_thread_id,
                         "future_data::handle_on_completed",
-                        "NULL thread id encountered");
+                        "null thread id encountered");
             }
 
 #if defined(HPX_WINDOWS)
@@ -702,12 +702,12 @@ namespace detail
 
     public:
         task_base()
-          : started_(false), sched_(0)
+          : started_(false), sched_(nullptr)
         {}
 
         task_base(threads::executor& sched)
           : started_(false),
-            sched_(sched ? &sched : 0)
+            sched_(sched ? &sched : nullptr)
         {}
 
         virtual void execute_deferred(error_code& ec = throws)
@@ -739,7 +739,7 @@ namespace detail
             if (!started_test())
                 return future_status::deferred; //-V110
             return this->future_data<Result>::wait_until(abs_time, ec);
-        };
+        }
 
     private:
         bool started_test() const
@@ -801,9 +801,10 @@ namespace detail
             this->future_data<Result>::set_data(std::forward<T>(result));
         }
 
-        void set_exception(boost::exception_ptr const& e)
+        void set_exception(
+            boost::exception_ptr const& e, error_code& ec = throws)
         {
-            this->future_data<Result>::set_exception(e);
+            this->future_data<Result>::set_exception(e, ec);
         }
 
         virtual void do_run()

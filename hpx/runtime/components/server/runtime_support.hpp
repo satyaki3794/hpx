@@ -346,10 +346,6 @@ namespace hpx { namespace components { namespace server
             components::component_type type);
 #endif
 
-        ///////////////////////////////////////////////////////////////////////
-        std::shared_ptr<util::one_size_heap_list_base> get_promise_heap(
-            components::component_type type);
-
     protected:
         // Load all components from the ini files found in the configuration
         int load_components(util::section& ini, naming::gid_type const& prefix,
@@ -481,7 +477,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -526,7 +522,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -580,7 +576,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance(s) of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -632,7 +628,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance(s) of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::create_component",
                 strm.str());
@@ -691,7 +687,7 @@ namespace hpx { namespace components { namespace server
             strm << "attempt to create component instance of "
                 << "invalid/unknown type: "
                 << components::get_component_type_name(type)
-                << " (map entry is NULL)";
+                << " (map entry is nullptr)";
             HPX_THROW_EXCEPTION(hpx::bad_component_type,
                 "runtime_support::copy_create_component",
                 strm.str());
@@ -753,7 +749,7 @@ namespace hpx { namespace components { namespace server
                 strm << "attempt to migrate component instance of "
                     << "invalid/unknown type: "
                     << components::get_component_type_name(type)
-                    << " (map entry is NULL)";
+                    << " (map entry is nullptr)";
 
                 l.unlock();
                 HPX_THROW_EXCEPTION(hpx::bad_component_type,
