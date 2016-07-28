@@ -68,7 +68,7 @@ namespace hpx { namespace threads { namespace policies
     // We globally control whether to do minimal deadlock detection using this
     // global bool variable. It will be set once by the runtime configuration
     // startup code
-    extern bool minimal_deadlock_detection;
+    HPX_EXPORT extern bool minimal_deadlock_detection;
 #endif
 
     ///////////////////////////////////////////////////////////////////////////

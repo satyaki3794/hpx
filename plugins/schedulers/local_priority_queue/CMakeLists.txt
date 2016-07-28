@@ -16,5 +16,6 @@ macro(add_local_priority_queue_module)
           ${PROJECT_SOURCE_DIR}/hpx/plugins/local_priority_queue_scheduler_plugin_factory.hpp
     FOLDER "Core/Plugins/Schedulers/LocalPriorityQueue"
     )
+    add_hpx_pseudo_dependencies(core plugins.schedulers.local_priority_queue)
 endmacro()
 
