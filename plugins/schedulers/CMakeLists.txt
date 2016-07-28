@@ -4,7 +4,8 @@
 # file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
 
 set(scheduler_plugins
-    local_priority_queue)
+    local_priority_queue
+    local_queue)
 
 foreach(type ${scheduler_plugins})
   add_hpx_pseudo_target(plugins.schedulers.${type})
@@ -14,4 +15,5 @@ endforeach()
 
 macro(add_scheduler_modules)
   add_local_priority_queue_module()
+  add_local_queue_module()
 endmacro()

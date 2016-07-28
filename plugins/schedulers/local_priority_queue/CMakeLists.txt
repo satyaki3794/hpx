@@ -7,7 +7,7 @@ include(HPX_AddLibrary)
 
 macro(add_local_priority_queue_module)
   hpx_debug("add_local_priority_queue_module")
-  add_hpx_library(loaded_plugin
+  add_hpx_library(local_priority_queue_scheduler
     PLUGIN
     SOURCES
           "${PROJECT_SOURCE_DIR}/plugins/schedulers/local_priority_queue/local_priority_queue_scheduler_registration.cpp"
