@@ -7,7 +7,9 @@ set(scheduler_plugins
     local_priority_queue
     local_queue
     static_priority_queue
-    static_queue)
+    static_queue
+    periodic_priority_queue
+    hierarchy)
 
 foreach(type ${scheduler_plugins})
   add_hpx_pseudo_target(plugins.schedulers.${type})
@@ -20,4 +22,6 @@ macro(add_scheduler_modules)
   add_local_queue_module()
   add_static_priority_queue_module()
   add_static_queue_module()
+  add_periodic_priority_queue_module()
+  add_hierarchy_module()
 endmacro()

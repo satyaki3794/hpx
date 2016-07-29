@@ -14,7 +14,7 @@ macro(add_static_queue_module)
     HEADERS
           ${PROJECT_SOURCE_DIR}/hpx/runtime/threads/policies/static_queue_scheduler.hpp
           ${PROJECT_SOURCE_DIR}/hpx/plugins/static_queue_scheduler_plugin_factory.hpp
-    FOLDER "Core/Plugins/Schedulers/LocalQueue"
+    FOLDER "Core/Plugins/Schedulers/StaticQueue"
     )
     add_hpx_pseudo_dependencies(core plugins.schedulers.static_queue)
 endmacro()
