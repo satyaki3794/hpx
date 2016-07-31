@@ -14,7 +14,7 @@
 #include <hpx/plugins/scheduler_plugin_factory_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx{ namespace threads { namespace policies
+namespace hpx{ namespace plugins
 {
     ///////////////////////////////////////////////////////////////////////////
     template <typename SchedulerPlugin>
@@ -35,7 +35,7 @@ namespace hpx{ namespace threads { namespace policies
         ///
         /// \returns Returns the newly created instance of the plugin
         ///          supported by this factory
-        scheduler_base* create(std::size_t num_queues_=1,
+        threads::policies::scheduler_base* create(std::size_t num_queues_=1,
             std::size_t num_high_priority_queues_=1,
             std::size_t max_queue_thread_count_=1000,
             std::size_t numa_sensitive_=0,
@@ -55,17 +55,17 @@ namespace hpx{ namespace threads { namespace policies
         hpx::util::section local_settings_;
         bool is_enabled_;
     };
-}}}
+}}
 
 ///////////////////////////////////////////////////////////////////////////////
 /// This macro is used create and to register a minimal example factory with
 /// Hpx.Plugin.
 #define HPX_REGISTER_PPQ_SCHEDULER_PLUGIN_FACTORY(SchedulerPlugin, pluginname)                                            \
     HPX_REGISTER_SCHEDULER_PLUGIN_FACTORY_BASE(                                                                       \
-        hpx::threads::policies::periodic_priority_queue_scheduler_plugin_factory<SchedulerPlugin>, pluginname)           \
+        hpx::plugins::periodic_priority_queue_scheduler_plugin_factory<SchedulerPlugin>, pluginname)           \
     HPX_DEF_UNIQUE_PLUGIN_NAME(                                                                                       \
-        hpx::threads::policies::periodic_priority_queue_scheduler_plugin_factory<SchedulerPlugin>, pluginname)           \
-    template struct hpx::threads::policies::periodic_priority_queue_scheduler_plugin_factory<SchedulerPlugin>;           \
+        hpx::plugins::periodic_priority_queue_scheduler_plugin_factory<SchedulerPlugin>, pluginname)           \
+    template struct hpx::plugins::periodic_priority_queue_scheduler_plugin_factory<SchedulerPlugin>;           \
     HPX_REGISTER_PLUGIN_REGISTRY_2(SchedulerPlugin, pluginname)                                                       \
 /**/
 

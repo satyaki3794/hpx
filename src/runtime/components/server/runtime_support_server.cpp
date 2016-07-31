@@ -50,6 +50,7 @@
 
 #include <hpx/plugins/message_handler_factory_base.hpp>
 #include <hpx/plugins/binary_filter_factory_base.hpp>
+#include <hpx/plugins/scheduler_plugin_factory_base.hpp>
 
 #include <hpx/plugins/parcelport/mpi/mpi_environment.hpp>
 
@@ -1564,6 +1565,57 @@ namespace hpx { namespace components { namespace server
         LRT_(info) << "successfully binary filter handler plugin of type: "
                     << binary_filter_type;
         return bf;
+    }
+
+    threads::policies::scheduler_base* runtime_support::create_scheduler(
+        char const* scheduler_type, std::size_t num_queues_,
+        std::size_t num_high_priority_queues_,
+        std::size_t max_queue_thread_count_, std::size_t numa_sensitive_,
+        char const* description_, error_code& ec)
+    {
+        // locate the factory for the requested plugin type
+        typedef std::unique_lock<plugin_map_mutex_type> plugin_map_scoped_lock;
+        plugin_map_scoped_lock l(p_mtx_);
+
+        plugin_map_type::const_iterator it = plugins_.find(scheduler_type);
+        if (it == plugins_.end() || !(*it).second.first) {
+            // we don't know anything about this component
+            std::ostringstream strm;
+            strm << "attempt to create scheduler plugin instance of "
+                    "invalid/unknown type: " << scheduler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_scheduler",
+                strm.str());
+            return nullptr;
+        }
+
+        l.unlock();
+
+        // create new component instance
+        std::shared_ptr<plugins::scheduler_plugin_factory_base> factory(
+            std::static_pointer_cast<plugins::scheduler_plugin_factory_base>(
+                (*it).second.first));
+
+        threads::policies::scheduler_base* sf = factory->create(num_queues_,
+            num_high_priority_queues_, max_queue_thread_count_,
+            numa_sensitive_, description_);
+        if (nullptr == sf) {
+            std::ostringstream strm;
+            strm << "couldn't create scheduler plugin of type: "
+                 << scheduler_type;
+            HPX_THROWS_IF(ec, hpx::bad_plugin_type,
+                "runtime_support::create_scheduler",
+                strm.str());
+            return nullptr;
+        }
+
+        if (&ec != &throws)
+            ec = make_success_code();
+
+        // log result if requested
+        LRT_(info) << "successfully created scheduler plugin of type: "
+                    << scheduler_type;
+        return sf;
     }
 
     ///////////////////////////////////////////////////////////////////////////

@@ -16,12 +16,12 @@
 #include <hpx/runtime/threads/policies/scheduler_base.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
-namespace hpx { namespace threads { namespace policies
+namespace hpx { namespace plugins
 {
     ///////////////////////////////////////////////////////////////////////////
     /// The \a plugin_factory_base has to be used as a base class for all
     /// plugin factories.
-    struct scheduler_plugin_factory_base : hpx::plugins::plugin_factory_base
+    struct HPX_EXPORT scheduler_plugin_factory_base : hpx::plugins::plugin_factory_base
     {
         virtual ~scheduler_plugin_factory_base() {}
 
@@ -29,13 +29,13 @@ namespace hpx { namespace threads { namespace policies
         ///
         /// return Returns the newly created instance of the message handler
         ///        supported by this factory
-        virtual scheduler_base* create(std::size_t num_queues_,
+        virtual threads::policies::scheduler_base* create(std::size_t num_queues_,
             std::size_t num_high_priority_queues_,
             std::size_t max_queue_thread_count_,
             std::size_t numa_sensitive_,
             char const* description_) = 0;
     };
-}}}
+}}
 
 namespace hpx { namespace util { namespace plugin
 {
@@ -58,7 +58,7 @@ namespace hpx { namespace util { namespace plugin
     //     };
     //
     template <>
-    struct virtual_constructor<hpx::threads::policies::scheduler_plugin_factory_base>
+    struct virtual_constructor<hpx::plugins::scheduler_plugin_factory_base>
     {
         typedef
             hpx::util::detail::pack<

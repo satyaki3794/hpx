@@ -337,6 +337,11 @@ namespace hpx { namespace components { namespace server
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec);
+        threads::policies::scheduler_base* create_scheduler(
+            char const* scheduler_type, std::size_t num_queues_,
+            std::size_t num_high_priority_queues_,
+            std::size_t max_queue_thread_count_, std::size_t numa_sensitive_,
+            char const* description_, error_code& ec);
 
         // notify of message being sent
         void dijkstra_make_black();
