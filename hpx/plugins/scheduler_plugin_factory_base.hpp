@@ -29,7 +29,11 @@ namespace hpx { namespace threads { namespace policies
         ///
         /// return Returns the newly created instance of the message handler
         ///        supported by this factory
-        virtual scheduler_base* create() = 0;
+        virtual scheduler_base* create(std::size_t num_queues_,
+            std::size_t num_high_priority_queues_,
+            std::size_t max_queue_thread_count_,
+            std::size_t numa_sensitive_,
+            char const* description_) = 0;
     };
 }}}
 

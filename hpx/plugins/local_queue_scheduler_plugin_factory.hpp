@@ -35,12 +35,17 @@ namespace hpx{ namespace threads { namespace policies
         ///
         /// \returns Returns the newly created instance of the plugin
         ///          supported by this factory
-        scheduler_base* create()
+        scheduler_base* create(std::size_t num_queues_=1,
+            std::size_t num_high_priority_queues_=1,
+            std::size_t max_queue_thread_count_=1000,
+            std::size_t numa_sensitive_=0,
+            char const* description_="local_queue_scheduler")
         {
             if (is_enabled_){
                 typedef hpx::threads::policies::local_queue_scheduler<> sh;
                 typedef sh::init_parameter_type init;
-                return new sh(init());
+                return new sh(init(num_queues_, max_queue_thread_count_,
+                    numa_sensitive_, description_));
             }
             return 0;
         }
