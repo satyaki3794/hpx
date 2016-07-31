@@ -16,6 +16,7 @@
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/threads/policies/affinity_data.hpp>
 #include <hpx/runtime/threads/policies/callback_notifier.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/threads/topology.hpp>
 #include <hpx/runtime_fwd.hpp>
 #include <hpx/state.hpp>
@@ -324,6 +325,11 @@ namespace hpx
         serialization::binary_filter* create_binary_filter(
             char const* binary_filter_type, bool compress,
             serialization::binary_filter* next_filter, error_code& ec = throws);
+        threads::policies::scheduler_base* create_scheduler(
+            char const* scheduler_type, std::size_t num_queues_,
+            std::size_t num_high_priority_queues_,
+            std::size_t max_queue_thread_count_, std::size_t numa_sensitive_,
+            char const* description_, error_code& ec = throws);
 
 #if defined(HPX_HAVE_SECURITY)
         components::security::signed_certificate

@@ -646,6 +646,17 @@ namespace hpx
             compress, next_filter, ec);
     }
 
+    threads::policies::scheduler_base* runtime::create_scheduler(
+        char const* scheduler_type, std::size_t num_queues_,
+        std::size_t num_high_priority_queues_,
+        std::size_t max_queue_thread_count_, std::size_t numa_sensitive_,
+        char const* description_, error_code& ec)
+    {
+        return runtime_support_->create_scheduler(scheduler_type,
+            num_queues_, num_high_priority_queues_, max_queue_thread_count_,
+            numa_sensitive_, description_, ec);
+    }
+
     /// \brief Register all performance counter types related to this runtime
     ///        instance
     void runtime::register_counter_types()
@@ -1513,6 +1524,24 @@ namespace hpx
                     (binary_filter_type, compress, next_filter, ec);
 
         HPX_THROWS_IF(ec, invalid_status, "create_binary_filter",
+            "the runtime system is not available at this time");
+        return nullptr;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Create an instance of a scheduler plugin
+    threads::policies::scheduler_base* create_scheduler(
+        char const* scheduler_type, std::size_t num_queues_,
+        std::size_t num_high_priority_queues_, std::size_t max_queue_thread_count_,
+        std::size_t numa_sensitive_, char const* description_, error_code& ec)
+    {
+        runtime* rt = get_runtime_ptr();
+        if (nullptr != rt)
+            return rt->create_scheduler(scheduler_type,
+                num_queues_, num_high_priority_queues_, max_queue_thread_count_,
+                numa_sensitive_, description_, ec);
+
+        HPX_THROWS_IF(ec, invalid_status, "create_scheduler",
             "the runtime system is not available at this time");
         return nullptr;
     }

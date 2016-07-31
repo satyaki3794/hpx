@@ -25,6 +25,7 @@
 #include <hpx/runtime/runtime_fwd.hpp>
 #include <hpx/runtime/runtime_mode.hpp>
 #include <hpx/runtime/set_parcel_write_handler.hpp>
+#include <hpx/runtime/threads/policies/scheduler_base.hpp>
 #include <hpx/runtime/shutdown_function.hpp>
 #include <hpx/runtime/startup_function.hpp>
 #include <hpx/util/function.hpp>
@@ -245,6 +246,31 @@ namespace hpx
         char const* binary_filter_type, bool compress,
         serialization::binary_filter* next_filter = nullptr,
         error_code& ec = throws);
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief Create an instance of a scheduler plugin
+    ///
+    /// \param scheduler_type [in] The type of the scheduler to create
+    /// \param num_queues_     [in] The number of queues of the scheduler
+    /// \param num_high_priority_queues_    [in] The number of high priority queues
+    /// \param max_queue_thread_count_  [in] The maximum number of threads per queue
+    /// \param numa_sensitive_  [in] The scheduler is NUMA sensitive
+    /// \param description_  [in] The description of the scheduler
+    /// \param ec [in,out] this represents the error status on exit, if this
+    ///           is pre-initialized to \a hpx#throws the function will throw
+    ///           on error instead.
+    ///
+    /// \note     As long as \a ec is not pre-initialized to \a hpx::throws this
+    ///           function doesn't throw but returns the result code using the
+    ///           parameter \a ec. Otherwise it throws an instance of
+    ///           hpx::exception.
+    HPX_API_EXPORT threads::policies::scheduler_base* create_scheduler(
+        char const* scheduler_type, std::size_t num_queues_,
+        std::size_t num_high_priority_queues_,
+        std::size_t max_queue_thread_count_, std::size_t numa_sensitive_,
+        char const* description_, error_code& ec = throws);
+
 
 #if defined(HPX_HAVE_SODIUM)
     namespace components { namespace security
