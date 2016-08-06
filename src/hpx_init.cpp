@@ -1164,8 +1164,9 @@ namespace hpx
                     // OS thread plus separate dequeues for low/high priority
                     /// HPX-threads)
                     cfg.queuing_ = "local-priority";
-                    result = run_priority_local(std::move(startup),
-                        std::move(shutdown), cfg, blocking);
+                    result = run_scheduler(std::move(startup),
+                        std::move(shutdown), cfg, blocking,
+                        "local_priority_queue_scheduler");
                 }
                 else if (0 == std::string("static-priority").find(cfg.queuing_))
                 {
