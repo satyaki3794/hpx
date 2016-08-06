@@ -11,6 +11,7 @@
 #include <hpx/apply.hpp>
 #include <hpx/async.hpp>
 #include <hpx/runtime_impl.hpp>
+#include <hpx/interim_runtime_impl.hpp>
 #include <hpx/runtime/agas/addressing_service.hpp>
 #include <hpx/runtime/actions/plain_action.hpp>
 #include <hpx/runtime/components/runtime_support.hpp>
@@ -718,6 +719,57 @@ namespace hpx
 
             rt.release();          // pointer to runtime is stored in TLS
             return 0;
+        }
+
+        ///////////////////////////////////////////////////////////////////////
+        //run scheduler
+        int run_scheduler(startup_function_type startup,
+            shutdown_function_type shutdown, util::command_line_handling& cfg,
+            bool blocking, char const* scheduler_type)
+        {
+            ensure_hierarchy_arity_compatibility(cfg.vm_);
+
+#if defined(HPX_HAVE_LOCAL_SCHEDULER) || defined(HPX_HAVE_STATIC_SCHEDULER)
+            ensure_high_priority_compatibility(cfg.vm_);
+#endif
+#if defined(HPX_HAVE_PRIORITY_ABP) || defined(HPX_HAVE_PERIODIC_PRIORITY_SCHEDULER)
+            ensure_hwloc_compatibility(cfg.vm_);
+#endif
+#if defined(HPX_HAVE_HIERARCHY_SCHEDULER)
+            ensure_high_priority_compatibility(cfg.vm_);
+            ensure_numa_sensitivity_compatibility(cfg.vm_);
+            ensure_hwloc_compatibility(cfg.vm_);
+#endif
+
+            std::size_t num_high_priority_queues =
+                get_num_high_priority_queues(cfg);
+            std::size_t pu_offset = get_pu_offset(cfg);
+            std::size_t pu_step = get_pu_step(cfg);
+            std::string affinity_domain = get_affinity_domain(cfg);
+            std::string affinity_desc;
+            std::size_t numa_sensitive =
+                get_affinity_description(cfg, affinity_desc);
+            std::size_t arity = 2;
+            if (cfg.vm_.count("hpx:hierarchy-arity"))
+                arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
+
+            // scheduling policy
+            std::shared_ptr<threads::policies::scheduler_base>
+                scheduler (create_scheduler(scheduler_type, cfg.num_threads_,
+                    num_high_priority_queues, 1000, numa_sensitive,
+                    scheduler_type));
+
+            threads::policies::init_affinity_data affinity_init(
+                pu_offset, pu_step, affinity_domain, affinity_desc);
+
+            // Build and configure this runtime instance.
+            typedef hpx::interim_runtime_impl runtime_type;
+            std::unique_ptr<hpx::runtime> rt(
+                new runtime_type(cfg.rtcfg_,  scheduler, cfg.mode_, cfg.num_threads_,
+                    affinity_init));
+
+            return run_or_start(blocking, std::move(rt), cfg,
+                std::move(startup), std::move(shutdown));
         }
 
         ///////////////////////////////////////////////////////////////////////
