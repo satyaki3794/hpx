@@ -36,7 +36,7 @@ namespace hpx { namespace threads { namespace policies
             , typename StagedQueuing
             , typename TerminatedQueuing
              >
-    class periodic_priority_queue_scheduler
+    class HPX_EXPORT periodic_priority_queue_scheduler
         : public local_priority_queue_scheduler<
             Mutex, PendingQueuing, StagedQueuing, TerminatedQueuing
           >

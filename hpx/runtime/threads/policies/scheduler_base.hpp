@@ -61,7 +61,7 @@ namespace hpx { namespace threads { namespace policies
     ///////////////////////////////////////////////////////////////////////////
     /// The scheduler_base defines the interface to be implemented by all
     /// scheduler policies
-    struct scheduler_base
+    struct HPX_EXPORT scheduler_base
     {
     private:
         HPX_NON_COPYABLE(scheduler_base);
@@ -250,34 +250,43 @@ namespace hpx { namespace threads { namespace policies
             std::size_t num_thread = std::size_t(-1),
             bool reset = false) const = 0;
 
-        virtual void abort_all_suspended_threads() = 0;
+        virtual void abort_all_suspended_threads(){}
 
-        virtual bool cleanup_terminated(bool delete_all = false) = 0;
+        virtual bool cleanup_terminated(bool delete_all = false){
+            return true;
+        }
 
         virtual void create_thread(thread_init_data& data, thread_id_type* id,
             thread_state_enum initial_state, bool run_now, error_code& ec,
-            std::size_t num_thread) = 0;
+            std::size_t num_thread){}
 
         virtual bool get_next_thread(std::size_t num_thread,
-            boost::int64_t& idle_loop_count, threads::thread_data*& thrd) = 0;
+            boost::int64_t& idle_loop_count, threads::thread_data*& thrd){
+            return true;
+        }
 
         virtual void schedule_thread(threads::thread_data* thrd,
             std::size_t num_thread,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority_normal){}
+
         virtual void schedule_thread_last(threads::thread_data* thrd,
             std::size_t num_thread,
-            thread_priority priority = thread_priority_normal) = 0;
+            thread_priority priority = thread_priority_normal){}
 
         virtual bool destroy_thread(threads::thread_data* thrd,
-            boost::int64_t& busy_count) = 0;
+            boost::int64_t& busy_count){
+            return true;
+        }
 
         virtual bool wait_or_add_new(std::size_t num_thread, bool running,
-            boost::int64_t& idle_loop_count) = 0;
+            boost::int64_t& idle_loop_count){
+            return true;
+        }
 
-        virtual void on_start_thread(std::size_t num_thread) = 0;
-        virtual void on_stop_thread(std::size_t num_thread) = 0;
+        virtual void on_start_thread(std::size_t num_thread){}
+        virtual void on_stop_thread(std::size_t num_thread){}
         virtual void on_error(std::size_t num_thread,
-            boost::exception_ptr const& e) = 0;
+            boost::exception_ptr const& e){}
 
 #ifdef HPX_HAVE_THREAD_QUEUE_WAITTIME
         virtual boost::int64_t get_average_thread_wait_time(

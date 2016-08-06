@@ -49,7 +49,7 @@ namespace hpx { namespace threads { namespace policies
             , typename StagedQueuing
             , typename TerminatedQueuing
              >
-    class local_queue_scheduler : public scheduler_base
+    class HPX_EXPORT local_queue_scheduler : public scheduler_base
     {
     protected:
         // The maximum number of active threads this thread manager should
