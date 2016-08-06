@@ -29,11 +29,13 @@
 #include <boost/detail/endian.hpp>
 #include <boost/exception_ptr.hpp>
 
+#include <chrono>
 #include <limits>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -382,7 +384,7 @@ namespace hpx { namespace parcelset
             if (ec) return;
 
             threads::set_thread_state(id,
-                boost::chrono::milliseconds(100), threads::pending,
+                std::chrono::milliseconds(100), threads::pending,
                 threads::wait_signaled, threads::thread_priority_boost, ec);
         }
 

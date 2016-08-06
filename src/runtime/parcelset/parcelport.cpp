@@ -16,7 +16,10 @@
 #include <hpx/util/safe_lexical_cast.hpp>
 #include <hpx/exception.hpp>
 
+#include <boost/chrono/chrono.hpp>
+
 #include <string>
+#include <utility>
 
 namespace hpx { namespace parcelset
 {
@@ -66,8 +69,8 @@ namespace hpx { namespace parcelset
         {
             while (threads::threadmanager_is(state_starting))
             {
-                boost::this_thread::sleep(boost::get_system_time() +
-                    boost::posix_time::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
+                boost::this_thread::sleep_for(
+                    boost::chrono::milliseconds(HPX_NETWORK_RETRIES_SLEEP));
             }
 
             // Give up if we're shutting down.

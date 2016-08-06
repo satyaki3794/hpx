@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <string>
+#include <utility>
 #include <vector>
 
 char const* gather_basename = "/test/gather/";
@@ -53,7 +54,8 @@ int hpx_main(int argc, char* argv[])
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> cfg;
-    cfg.push_back("hpx.run_hpx_main!=1");
+    std::vector<std::string> const cfg = {
+        "hpx.run_hpx_main!=1"
+    };
     return hpx::init(argc, argv, cfg);
 }
