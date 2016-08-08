@@ -754,10 +754,10 @@ namespace hpx
                 arity = cfg.vm_["hpx:hierarchy-arity"].as<std::size_t>();
 
             // scheduling policy
-            std::shared_ptr<threads::policies::scheduler_base>
-                scheduler (create_scheduler(scheduler_type, cfg.num_threads_,
-                    num_high_priority_queues, 1000, numa_sensitive,
-                    scheduler_type));
+            // std::shared_ptr<threads::policies::scheduler_base>
+            //     scheduler (create_scheduler(scheduler_type, cfg.num_threads_,
+            //         num_high_priority_queues, 1000, numa_sensitive,
+            //         scheduler_type));
 
             threads::policies::init_affinity_data affinity_init(
                 pu_offset, pu_step, affinity_domain, affinity_desc);
@@ -765,7 +765,9 @@ namespace hpx
             // Build and configure this runtime instance.
             typedef hpx::interim_runtime_impl runtime_type;
             std::unique_ptr<hpx::runtime> rt(
-                new runtime_type(cfg.rtcfg_,  scheduler, cfg.mode_, cfg.num_threads_,
+                new runtime_type(cfg.rtcfg_, cfg.num_threads_,
+                    num_high_priority_queues, 1000, numa_sensitive,
+                    scheduler_type, cfg.mode_, cfg.num_threads_,
                     affinity_init));
 
             return run_or_start(blocking, std::move(rt), cfg,

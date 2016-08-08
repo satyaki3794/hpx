@@ -69,7 +69,9 @@ namespace hpx
         /// \param num_threads    [in] The initial number of threads to be started
         ///                       by the thread-manager.
         explicit interim_runtime_impl(util::runtime_configuration & rtcfg,
-            std::shared_ptr<threads::policies::scheduler_base> scheduler,
+            std::size_t num_queues, std::size_t num_high_priority_queues,
+            std::size_t max_queue_thread_count, std::size_t numa_sensitive,
+            char const* description,
             runtime_mode locality_mode = runtime_mode_console,
             std::size_t num_threads = 1,
             threads::policies::init_affinity_data const& affinity_init =

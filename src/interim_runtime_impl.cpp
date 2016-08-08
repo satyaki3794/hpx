@@ -128,11 +128,15 @@ namespace hpx {
     ///////////////////////////////////////////////////////////////////////////
     interim_runtime_impl::interim_runtime_impl(
             util::runtime_configuration & rtcfg,
-            std::shared_ptr<threads::policies::scheduler_base> scheduler,
+            std::size_t num_queues, std::size_t num_high_priority_queues,
+            std::size_t max_queue_thread_count, std::size_t numa_sensitive,
+            char const* description,
             runtime_mode locality_mode, std::size_t num_threads,
             threads::policies::init_affinity_data const& init_affinity)
       : runtime(rtcfg, init_affinity),
-        scheduler_(scheduler),
+        scheduler_(create_scheduler(description, num_queues,
+                    num_high_priority_queues, max_queue_thread_count,
+                    numa_sensitive, description)),
         mode_(locality_mode), result_(0), num_threads_(num_threads),
         main_pool_(1,
             util::bind(&interim_runtime_impl::init_tss, This(), "main-thread",
