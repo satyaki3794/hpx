@@ -9,13 +9,13 @@
 
 [section:schedulers __hpx__ Thread Scheduling Policies]
 
-The HPX runtime has six thread scheduling policies: local-priority, local,
+HPX uses a plugin mechanism for thread schedulers. The runtime provides six thread scheduling policies: local-priority, local,
 abp-priority, hierarchy, static-priority, and periodic-priority. These policies
 can be specified from the command line using the command line option
 [hpx_cmdline `--hpx:queuing`]. In order to use a particular scheduling policy,
-the runtime system must be built with the appropriate scheduler flag turned on
+the runtime system must be specified with the appropriate scheduler flag turned on so that the plugin module is created and loaded
 (e.g. `cmake -DHPX_THREAD_SCHEDULERS=local`, see __cmake_options__ for more
-information).
+information). Apart from these, HPX also provides developers the freedom to write their own custom schedulers, following the blueprint laid out by class scheduler_base.
 
 [heading Priority Local Scheduling Policy (default policy)]
 
